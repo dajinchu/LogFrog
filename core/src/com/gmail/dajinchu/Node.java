@@ -8,5 +8,12 @@ import java.util.ArrayList;
 public class Node {
 
     int x,y;
-    private ArrayList<Link> connected = new ArrayList<Link>();
+    int id;
+    ArrayList<Link> connected = new ArrayList<Link>();
+
+    public Node(int id, int x, int y){
+        this.id=id;
+        this.x=x;
+        this.y=y;
+    }
 }
