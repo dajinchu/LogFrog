@@ -37,14 +37,9 @@ public class MainGame extends ApplicationAdapter {
         cam.update();
         renderer.setProjectionMatrix(cam.combined);
         batch.setProjectionMatrix(cam.combined);
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-        for(Node n:model.nodes){
-            batch.draw(img,n.x*20,n.y*20,10,10);
-        }
-        batch.end();
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
+		renderer.begin(ShapeRenderer.ShapeType.Filled);
         for(Link l:model.links){
             if(l.on){
                 renderer.setColor(Color.YELLOW);
@@ -54,7 +49,12 @@ public class MainGame extends ApplicationAdapter {
             renderer.rectLine(l.n1.x * 20, l.n1.y * 20, l.n2.x * 20, l.n2.y * 20, 2);
         }
         renderer.end();
-	}
+        batch.begin();
+        for(Node n:model.nodes){
+            batch.draw(img,n.x*20-5,n.y*20,10,10);
+        }
+        batch.end();
+    }
 
     @Override
     public void resize(int w, int h){
