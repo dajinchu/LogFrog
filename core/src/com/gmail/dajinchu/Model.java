@@ -17,6 +17,8 @@ public class Model {
 
     int playerNode = 0;
 
+    Link selected;
+
     public Model(FileHandle level){
         BufferedReader reader = level.reader(64);
         String in, data[];
@@ -56,14 +58,29 @@ public class Model {
         updateHighlight();
     }
 
+    public void selectLink(Link link){
+        if(selected!=null&&selected.equals(link)){
+            //Clicked on already selected
+            selected.state= Link.STATE.CONNECTED;
+            selected=null;
+            return;
+        }
+        //Must be a connected link to be selected aka picked up
+        if(link.state!= Link.STATE.CONNECTED)return;
+        //If there is already someone selected, get rid of it
+        if(selected!=null)selected.state= Link.STATE.CONNECTED;
+        selected = link;
+        link.state = Link.STATE.SELECTED;
+    }
+
     private void updateHighlight(){
         traverseNode(nodes.get(playerNode));
     }
 
     private void traverseNode(Node n){
         for(Link l:n.connected){
-            if(l.on)continue;
-            l.on=true;
+            if(l.state== Link.STATE.CONNECTED)continue;
+            l.state= Link.STATE.CONNECTED;
             traverseNode(l.getOther(n));
         }
     }
