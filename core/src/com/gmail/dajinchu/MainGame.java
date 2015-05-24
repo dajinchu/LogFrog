@@ -46,7 +46,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
         batch.begin();
-        for(Node n:model.nodes){
+        for(Node n:model.nodes.values()){
             batch.draw(img,n.x*20-5,n.y*20,10,10);
         }
         batch.end();
@@ -54,8 +54,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
             switch (l.state){
                 case CONNECTED:renderer.setColor(Color.YELLOW);break;
                 case DISCONNECTED:renderer.setColor(Color.BLACK);break;
-                case SELECTED:renderer.setColor(Color.MAROON);break;
+                case POTENTIAL:renderer.setColor(Color.GRAY);break;
             }
+            if(l.selected)renderer.setColor(Color.MAROON);
             renderer.rect(l.rect.x, l.rect.y, l.rect.width, l.rect.height);
         }
         renderer.end();
@@ -90,10 +91,11 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         Rectangle click = new Rectangle(v.x,v.y,1,1);
         Gdx.app.log("Input", screenX+","+screenY);
         Gdx.app.log("Input", v.x+","+v.y);
-        for(Link l:model.links){
-            if(l.rect.overlaps(click)){
+        Object[] l =model.links.begin();
+        for(int i = 0, n = model.links.size; i<n;i++){
+            if(((Link)l[i]).rect.overlaps(click)){
                 Gdx.app.log("Clicked", "y");
-                model.selectLink(l);
+                model.selectLink(((Link)l[i]));
             }
         }
         return false;

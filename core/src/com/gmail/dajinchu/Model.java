@@ -2,7 +2,8 @@ package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,8 +13,8 @@ import java.io.IOException;
  */
 public class Model {
 
-    Array<Node> nodes = new Array<Node>();
-    Array<Link> links = new Array<Link>();
+    IntMap<Node> nodes = new IntMap<Node>();
+    public static SnapshotArray<Link> links = new SnapshotArray<Link>();
 
     int playerNode = 0;
 
@@ -32,14 +33,14 @@ public class Model {
                     //0 is N, so make a Node
                     data[0] = "0";
                     data1 = listparse(data);
-                    nodes.add(new Node(data1[1], data1[2], data1[3]));
+                    nodes.put(data1[1],new Node(data1[1], data1[2], data1[3]));
                 } else if (data[0].equals("L")) {
                     //Link
                     data[0] = "0";
                     data1 = listparse(data);
 
                     Node n1 = nodes.get(data1[1]), n2 = nodes.get(data1[2]);
-                    links.add(new Link(n1, n2));
+                    new Link(n1, n2);
                 }
             }
         } catch (IOException e) {
@@ -48,7 +49,7 @@ public class Model {
 
         Gdx.app.log("Model",level.readString());
 
-        for(Node n:nodes){
+        for(Node n:nodes.values()){
             Gdx.app.log("Model", "Node at "+n.x+","+n.y);
         }
         for(Link l:links){
@@ -59,30 +60,41 @@ public class Model {
     }
 
     public void selectLink(Link link){
-        if(selected!=null&&selected.equals(link)){
-            //Clicked on already selected
-            selected.state= Link.STATE.CONNECTED;
+        if(link.state== Link.STATE.POTENTIAL){
+            links.removeValue(selected,true);
             selected=null;
+            link.state= Link.STATE.DISCONNECTED;
+            playerNode=link.n1.id;
+            updateHighlight();
+            return;
+        }
+        if(link.selected){
+            //Clicked on already selected
+            link.selected=false;
+            selected=null;
+            updateHighlight();
             return;
         }
         //Must be a connected link to be selected aka picked up
         if(link.state!= Link.STATE.CONNECTED)return;
         //If there is already someone selected, get rid of it
-        if(selected!=null)selected.state= Link.STATE.CONNECTED;
+        if(selected!=null)selected.selected=false;
         selected = link;
-        link.state = Link.STATE.SELECTED;
+        link.selected = true;
+        updateHighlight();
     }
 
     private void updateHighlight(){
-        traverseNode(nodes.get(playerNode));
-    }
-
-    private void traverseNode(Node n){
-        for(Link l:n.connected){
-            if(l.state== Link.STATE.CONNECTED)continue;
-            l.state= Link.STATE.CONNECTED;
-            traverseNode(l.getOther(n));
+        Object[] l = links.begin();
+        for(int i = 0, n = links.size; i < n; i++){
+            if(((Link)l[i]).state== Link.STATE.POTENTIAL){
+                links.removeIndex(i);
+            }else {
+                ((Link) l[i]).state = Link.STATE.DISCONNECTED;
+            }
         }
+        links.end();
+        nodes.get(playerNode).traverseNode(selected);
     }
 
     private int[] listparse(String[] a){
