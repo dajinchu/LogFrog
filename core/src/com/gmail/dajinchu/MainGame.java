@@ -3,6 +3,7 @@ package com.gmail.dajinchu;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,7 +46,12 @@ public class MainGame extends ApplicationAdapter {
         batch.end();
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         for(Link l:model.links){
-            renderer.rectLine(l.n1.x*20,l.n1.y*20,l.n2.x*20,l.n2.y*20,2);
+            if(l.on){
+                renderer.setColor(Color.YELLOW);
+            }else{
+                renderer.setColor(Color.BLACK);
+            }
+            renderer.rectLine(l.n1.x * 20, l.n1.y * 20, l.n2.x * 20, l.n2.y * 20, 2);
         }
         renderer.end();
 	}

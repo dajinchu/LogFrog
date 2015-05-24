@@ -21,4 +21,14 @@ public class Link {
         n1.connected.add(this);
         n2.connected.add(this);
     }
+
+    public Node getOther(Node node){
+        if(n1.equals(node)){
+            return n2;
+        }
+        if(n2.equals(node)){
+            return n1;
+        }
+        throw new RuntimeException("used getOTher with a neither");
+    }
 }

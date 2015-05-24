@@ -15,6 +15,7 @@ public class Model {
     Array<Node> nodes = new Array<Node>();
     Array<Link> links = new Array<Link>();
 
+    int playerNode = 0;
 
     public Model(FileHandle level){
         BufferedReader reader = level.reader(64);
@@ -52,6 +53,19 @@ public class Model {
             Gdx.app.log("Model", "Link at "+l.n1.x+","+l.n1.y+"->"+l.n2.x+","+l.n2.y);
         }
 
+        updateHighlight();
+    }
+
+    private void updateHighlight(){
+        traverseNode(nodes.get(playerNode));
+    }
+
+    private void traverseNode(Node n){
+        for(Link l:n.connected){
+            if(l.on)continue;
+            l.on=true;
+            traverseNode(l.getOther(n));
+        }
     }
 
     private int[] listparse(String[] a){
