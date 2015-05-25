@@ -2,6 +2,7 @@ package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.SnapshotArray;
 
@@ -14,6 +15,7 @@ import java.io.IOException;
 public class Model {
 
     IntMap<Node> nodes = new IntMap<Node>();
+    public static Array<LinkSpace> linknodes = new Array<LinkSpace>();
     public static SnapshotArray<Link> links = new SnapshotArray<Link>();
 
     int playerNode = 0;
@@ -60,6 +62,9 @@ public class Model {
     }
 
     public void selectLink(Link link){
+        for(LinkSpace ls:linknodes)Node.nodegrid[ls.x][ls.y]=null;
+        linknodes.clear();
+
         if(link.state== Link.STATE.POTENTIAL){
             links.removeValue(selected,true);
             selected=null;
@@ -85,13 +90,25 @@ public class Model {
     }
 
     private void updateHighlight(){
+        for(Link link:links){
+            if(link.state== Link.STATE.POTENTIAL)continue;
+            int deltax = (link.n1.x-link.n2.x)/link.distance;
+            int deltay = (link.n1.y-link.n2.y)/link.distance;
+            Gdx.app.log("reclalc linknodes", deltax+" "+deltay);
+            for(int i = 1; i < link.distance; i++){
+                new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i);
+            }
+        }
         Object[] l = links.begin();
         for(int i = 0, n = links.size; i < n; i++){
-            if(((Link)l[i]).state== Link.STATE.POTENTIAL){
-                links.removeIndex(i);
+            if(((Link)l[i]).state == Link.STATE.POTENTIAL){
+                links.removeValue((Link)l[i],true);
             }else {
                 ((Link) l[i]).state = Link.STATE.DISCONNECTED;
             }
+        }
+        for(Node node: nodes.values()){
+            node.on=false;
         }
         links.end();
         nodes.get(playerNode).traverseNode(selected);

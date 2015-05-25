@@ -41,28 +41,32 @@ public class Link {
         //Find the left node
         if(n1.x<n2.x){
             //n1 is left
-            left=n1.x * 20;
+            left=n1.x;
         }else{
             //n2 is left
-            left=n2.x * 20;
+            left=n2.x;
         }
         //Find the bottom node
         if(n1.y<n2.y){
             //n1 is bottom
-            bottom=n1.y * 20;
+            bottom=n1.y;
         }else{
             //n2 is bottom
-            bottom=n2.y * 20;
+            bottom=n2.y;
         }
         if(horizontal){
             //Horizontal, so the "width" of rect is the long side
             width=Math.abs(n1.x-n2.x)*20;
             height=6;
+            left*=20;
+            bottom*=20;
             bottom+=(10-6)/2;
 
         }else{
             height=Math.abs(n1.y-n2.y)*20;
             width=6;
+            left*=20;
+            bottom*=20;
             left-=6/2;
             bottom+=10/2;
         }
