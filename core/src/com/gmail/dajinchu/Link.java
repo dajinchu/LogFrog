@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
  * Created by Da-Jin on 5/23/2015.
  */
 public class Link {
+    private final Model model;
     Node n1,n2;
     int distance;
     boolean selected=false;
@@ -16,12 +17,15 @@ public class Link {
 
     Rectangle rect;
 
-    public Link(Node n1, Node n2) {
-        for(Link l:Model.links){
+    private static final int WIDTH= 10;
+
+    public Link(Node n1, Node n2, Model model) {
+        this.model = model;
+        for(Link l:model.links){
             if((l.n1.equals(n1)&&l.n2.equals(n2))||
                     l.n1.equals(n2)&&l.n2.equals(n1))return;
         }
-        Model.links.add(this);
+        model.links.add(this);
         boolean horizontal;
         this.n1=n1;
         this.n2=n2;
@@ -57,18 +61,18 @@ public class Link {
         if(horizontal){
             //Horizontal, so the "width" of rect is the long side
             width=Math.abs(n1.x-n2.x)*20;
-            height=6;
+            height=WIDTH;
             left*=20;
             bottom*=20;
-            bottom+=(10-6)/2;
+            bottom+=(8-WIDTH)/2;
 
         }else{
             height=Math.abs(n1.y-n2.y)*20;
-            width=6;
+            width=WIDTH;
             left*=20;
             bottom*=20;
-            left-=6/2;
-            bottom+=10/2;
+            left-=WIDTH/2;
+            bottom+=8/2;
         }
         Gdx.app.log("Rect Create",horizontal+" "+left+" "+bottom+" "+width+" "+height);
         rect = new Rectangle(left, bottom, width, height);

@@ -13,13 +13,12 @@ import java.io.IOException;
  * Created by Da-Jin on 5/23/2015.
  */
 public class Model {
-
     IntMap<Node> nodes = new IntMap<Node>();
-    public static Array<LinkSpace> linknodes = new Array<LinkSpace>();
-    public static SnapshotArray<Link> links = new SnapshotArray<Link>();
+    Array<LinkSpace> linknodes = new Array<LinkSpace>();
+    SnapshotArray<Link> links = new SnapshotArray<Link>();
+    Node[][] nodegrid = new Node[5][7];
 
     int playerNode = 0;
-
     Link selected;
 
     public Model(FileHandle level){
@@ -35,14 +34,14 @@ public class Model {
                     //0 is N, so make a Node
                     data[0] = "0";
                     data1 = listparse(data);
-                    nodes.put(data1[1],new Node(data1[1], data1[2], data1[3]));
+                    nodes.put(data1[1],new Node(data1[1], data1[2], data1[3], this));
                 } else if (data[0].equals("L")) {
                     //Link
                     data[0] = "0";
                     data1 = listparse(data);
 
                     Node n1 = nodes.get(data1[1]), n2 = nodes.get(data1[2]);
-                    new Link(n1, n2);
+                    new Link(n1, n2, this);
                 }
             }
         } catch (IOException e) {
@@ -62,41 +61,41 @@ public class Model {
     }
 
     public void selectLink(Link link){
-        for(LinkSpace ls:linknodes)Node.nodegrid[ls.x][ls.y]=null;
+        for(LinkSpace ls:linknodes)nodegrid[ls.x][ls.y]=null;
         linknodes.clear();
 
         if(link.state== Link.STATE.POTENTIAL){
+            //Place it
             links.removeValue(selected,true);
             selected=null;
             link.state= Link.STATE.DISCONNECTED;
             playerNode=link.n1.id;
-            updateHighlight();
             return;
         }
         if(link.selected){
+            //Deselect currently selected
             //Clicked on already selected
             link.selected=false;
             selected=null;
-            updateHighlight();
             return;
         }
+        //Pick it up
         //Must be a connected link to be selected aka picked up
         if(link.state!= Link.STATE.CONNECTED)return;
         //If there is already someone selected, get rid of it
         if(selected!=null)selected.selected=false;
         selected = link;
         link.selected = true;
-        updateHighlight();
     }
 
-    private void updateHighlight(){
+    public void updateHighlight(){
         for(Link link:links){
             if(link.state== Link.STATE.POTENTIAL)continue;
             int deltax = (link.n1.x-link.n2.x)/link.distance;
             int deltay = (link.n1.y-link.n2.y)/link.distance;
             Gdx.app.log("reclalc linknodes", deltax+" "+deltay);
             for(int i = 1; i < link.distance; i++){
-                new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i);
+                new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i, this);
             }
         }
         Object[] l = links.begin();

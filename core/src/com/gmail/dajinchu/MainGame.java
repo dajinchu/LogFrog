@@ -3,7 +3,6 @@ package com.gmail.dajinchu;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,7 +15,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 	SpriteBatch batch;
 	private Model model;
     private ShapeRenderer renderer;
-    private Camera cam;
+    private OrthographicCamera cam;
 
     float mapHeight=140f, mapWidth = 140f;
 
@@ -27,9 +26,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         cam = new OrthographicCamera(mapWidth * (w / h), mapHeight);
-        cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
+        cam.rotate(90, 0, 0, 1);
         cam.update();
-        model = new Model(Gdx.files.internal("level40.txt"));
+        model = new Model(Gdx.files.internal("level1.txt"));
 
         Gdx.input.setInputProcessor(this);
 	}
@@ -46,23 +45,20 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
             switch (l.state){
                 case CONNECTED:renderer.setColor(Color.YELLOW);break;
                 case DISCONNECTED:renderer.setColor(Color.BLACK);break;
-                case POTENTIAL:renderer.setColor(Color.GRAY);break;
+                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
             }
             if(l.selected)renderer.setColor(Color.MAROON);
-            renderer.rect(l.rect.x, l.rect.y, l.rect.width, l.rect.height);
+            renderer.rectLine(l.n1.x*20,l.n1.y*20,l.n2.x*20,l.n2.y*20,4);
         }
         renderer.setColor(Color.LIGHT_GRAY);
         for(Node n:model.nodes.values()){
             if(n.on) {
                 renderer.setColor(Color.YELLOW);
             }else{
-                renderer.setColor(Color.GRAY);
+                renderer.setColor(Color.DARK_GRAY);
             }
-            renderer.circle(n.x*20,n.y*20+5,4);
-        }
-        renderer.setColor(Color.BLUE);
-        for(LinkSpace ls: Model.linknodes){
-            renderer.circle(ls.x*20,ls.y*20+5,2);
+            if(n.id==model.nodes.size-1)renderer.setColor(Color.GREEN);
+            renderer.circle(n.x*20,n.y*20,4);
         }
         renderer.end();
         }
@@ -70,8 +66,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     @Override
     public void resize(int w, int h){
         Gdx.app.log("Main", w+" "+h);
-        cam.viewportWidth = mapWidth*w/h;
-        cam.viewportHeight = mapHeight;
+        cam.viewportWidth = mapHeight*w/h;
+        cam.viewportHeight = mapWidth;
+        cam.position.set(50, mapHeight / 2f, 0);
         cam.update();
     }
 
@@ -100,11 +97,11 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         Gdx.app.log("Input", screenX+","+screenY);
         Gdx.app.log("Input", v.x+","+v.y);
         for(Node n:model.nodes.values())Gdx.app.log("Nodes", n.id+" "+n.x+" "+n.y);
-        for(Link link:Model.links)Gdx.app.log("Links", link.n1.id+" "+link.n2.id+" "+link.state);
-        for(LinkSpace ln:Model.linknodes)Gdx.app.log("Placeholder Nodes", ln.id+" "+ln.x+" "+ln.y);
+        for(Link link:model.links)Gdx.app.log("Links", link.n1.id+" "+link.n2.id+" "+link.state);
+        for(LinkSpace ln:model.linknodes)Gdx.app.log("Placeholder Nodes", ln.id+" "+ln.x+" "+ln.y);
 
 
-        for(Link l : Model.links){
+        for(Link l : model.links){
             if(l.rect.overlaps(clickBox)){
                 Gdx.app.log("Clicked", "y");
                 clickedLink = l;
@@ -113,8 +110,17 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         }
         if(clickedLink!=null){
             model.selectLink(clickedLink);
+            model.updateHighlight();
+            if(model.nodes.get(model.nodes.size-1).on){
+                //Goal has been reached!
+                nextLevel();
+            }
         }
         return false;
+    }
+
+    public void nextLevel(){
+        model = new Model(Gdx.files.internal("level40.txt"));
     }
 
     @Override

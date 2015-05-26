@@ -7,9 +7,9 @@ import com.badlogic.gdx.Gdx;
  */
 public class LinkSpace extends Node {
 
-    public LinkSpace(int x, int y) {
-        super(0,x,y);
-        Model.linknodes.add(this);
+    public LinkSpace(int x, int y, Model model) {
+        super(0,x,y, model);
+        model.linknodes.add(this);
         Gdx.app.log("LinkSpace", x+" "+y);
     }
     @Override
