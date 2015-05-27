@@ -3,6 +3,7 @@ package com.gmail.dajinchu;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -19,8 +20,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     float mapHeight=140f, mapWidth = 140f;
 
-    int level =1;
 
+    Preferences prefs;
+    int level;
     @Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -30,8 +32,11 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         cam = new OrthographicCamera(mapWidth * (w / h), mapHeight);
         cam.rotate(90, 0, 0, 1);
         cam.update();
-        model = new Model(Gdx.files.internal("level1.txt"));
 
+        prefs=Gdx.app.getPreferences("My Prefs");
+        level = prefs.getInteger("level",1);
+
+        loadLevel(level);
         Gdx.input.setInputProcessor(this);
 	}
 
@@ -123,7 +128,12 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     public void nextLevel(){
         level++;
-        model = new Model(Gdx.files.internal("level"+level+".txt"));
+        prefs.putInteger("level",level);
+        loadLevel(level);
+    }
+
+    private void loadLevel(int lvl){
+        model = new Model(Gdx.files.internal("level"+lvl+".txt"));
     }
 
     @Override
@@ -144,5 +154,10 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    @Override
+    public void pause(){
+        prefs.flush();
     }
 }
