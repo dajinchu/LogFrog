@@ -19,6 +19,8 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     float mapHeight=140f, mapWidth = 140f;
 
+    int level =1;
+
     @Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -120,7 +122,8 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     }
 
     public void nextLevel(){
-        model = new Model(Gdx.files.internal("level40.txt"));
+        level++;
+        model = new Model(Gdx.files.internal("level"+level+".txt"));
     }
 
     @Override
