@@ -95,8 +95,10 @@ public class Model {
     }
 
     public void updateHighlight(){
+        //Prevent overlap/intersection
         for(Link link:links){
-            if(link.state== Link.STATE.POTENTIAL)continue;
+            //Ignore potential links, and if it's selected, it'll get moved out of the way when replaced
+            if(link.state== Link.STATE.POTENTIAL||link.selected)continue;
             int deltax = (link.n1.x-link.n2.x)/link.distance;
             int deltay = (link.n1.y-link.n2.y)/link.distance;
             Gdx.app.log("reclalc linknodes", deltax+" "+deltay);
