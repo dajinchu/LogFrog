@@ -25,24 +25,30 @@ public class Model {
         BufferedReader reader = level.reader(64);
         String in, data[];
         int[] data1;
+        int id=0;
+        boolean readingNodes = true;
 
         try {
             while((in=reader.readLine())!=null) {
+                if(in.equals("LINK")){
+                    readingNodes=false;
+                    continue;
+                }
                 data = in.split(" ");
 
-                if (data[0].equals("N")) {
-                    //0 is N, so make a Node
-                    data[0] = "0";
+                if (readingNodes) {
+                    //make a Node
                     data1 = listparse(data);
-                    nodes.put(data1[1],new Node(data1[1], data1[2], data1[3], this));
-                } else if (data[0].equals("L")) {
+                    nodes.put(id,new Node(id, data1[0], data1[1], this));
+                } else {
                     //Link
-                    data[0] = "0";
                     data1 = listparse(data);
 
-                    Node n1 = nodes.get(data1[1]), n2 = nodes.get(data1[2]);
+                    Node n1 = nodes.get(data1[0]), n2 = nodes.get(data1[1]);
                     new Link(n1, n2, this);
                 }
+
+                id++;
             }
         } catch (IOException e) {
             e.printStackTrace();
