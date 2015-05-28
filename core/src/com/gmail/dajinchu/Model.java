@@ -121,6 +121,7 @@ public class Model {
     }
 
     public void clearSelection(){
+        if(selected==null)return;
         selected.selected=false;
         selected=null;
         return;
