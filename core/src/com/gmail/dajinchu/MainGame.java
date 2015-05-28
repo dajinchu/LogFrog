@@ -71,7 +71,6 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
                 case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
             }
             if(l.selected)renderer.setColor(Color.MAROON);
-            renderer.rect(l.rect.x,l.rect.y,l.rect.width,l.rect.height);
             renderer.rectLine(l.n1.x * 20 + 4, l.n1.y * 20 + 4, l.n2.x * 20 + 4, l.n2.y * 20 + 4, logWidth);
         }
         renderer.end();
@@ -121,12 +120,15 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         }
         if(clickedLink!=null){
             model.selectLink(clickedLink);
-            model.updateHighlight();
             if(model.nodes.get(model.nodes.size-1).on){
                 //Goal has been reached!
                 nextLevel();
             }
+        }else{
+            //If we just clicked away, clear the selected link
+            model.clearSelection();
         }
+        model.updateHighlight();
         return false;
     }
 

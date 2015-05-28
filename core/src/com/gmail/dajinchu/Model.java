@@ -81,8 +81,7 @@ public class Model {
         if(link.selected){
             //Deselect currently selected
             //Clicked on already selected
-            link.selected=false;
-            selected=null;
+            clearSelection();
             return;
         }
         //Pick it up
@@ -119,6 +118,12 @@ public class Model {
         }
         links.end();
         nodes.get(playerNode).traverseNode(selected);
+    }
+
+    public void clearSelection(){
+        selected.selected=false;
+        selected=null;
+        return;
     }
 
     private int[] listparse(String[] a){
