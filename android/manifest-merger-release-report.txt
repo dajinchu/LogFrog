@@ -27,7 +27,7 @@ ADDED from AndroidManifest.xml:9:5
 		ADDED from AndroidManifest.xml:11:9
 	android:theme
 		ADDED from AndroidManifest.xml:13:9
-activity#com.gmail.dajinchu.android.AndroidLauncher
+activity#com.gmail.dajinchu.logfrog.AndroidLauncher
 ADDED from AndroidManifest.xml:14:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:17:13
