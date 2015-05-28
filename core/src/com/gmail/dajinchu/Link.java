@@ -75,7 +75,7 @@ public class Link {
             bottom+=8/2;
         }
         Gdx.app.log("Rect Create",horizontal+" "+left+" "+bottom+" "+width+" "+height);
-        rect = new Rectangle(left, bottom, width, height);
+        rect = new Rectangle(left+4, bottom, width, height);
 
 
     }

@@ -6,32 +6,35 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame extends ApplicationAdapter implements InputProcessor{
 	SpriteBatch batch;
 	private Model model;
     private ShapeRenderer renderer;
-    private OrthographicCamera cam;
 
-    float mapHeight=140f, mapWidth = 140f;
+    float nodeRadius=4, logWidth=4;
+    int mapHeight, mapWidth;
 
 
     Preferences prefs;
     int level;
+    private Viewport viewport;
+
     @Override
 	public void create () {
 		batch = new SpriteBatch();
         renderer = new ShapeRenderer();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-        cam = new OrthographicCamera(mapWidth * (w / h), mapHeight);
-        cam.rotate(90, 0, 0, 1);
-        cam.update();
+        mapWidth = (int) (4*20+nodeRadius*2);
+        mapHeight = (int) (6*20+nodeRadius*2);
+        viewport = new ExtendViewport(mapWidth, mapHeight);
 
         prefs=Gdx.app.getPreferences("My Prefs");
         level = prefs.getInteger("level",1);
@@ -42,21 +45,16 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
 	@Override
 	public void render () {
-        cam.update();
-        renderer.setProjectionMatrix(cam.combined);
-        batch.setProjectionMatrix(cam.combined);
+        renderer.setProjectionMatrix(viewport.getCamera().combined);
+        batch.setProjectionMatrix(viewport.getCamera().combined);
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        renderer.begin(ShapeRenderer.ShapeType.Line);
+        renderer.setColor(Color.BLACK);
+        renderer.rect(0,0,mapWidth,mapHeight);
+        renderer.end();
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
-        for(Link l:model.links){
-            switch (l.state){
-                case CONNECTED:renderer.setColor(Color.YELLOW);break;
-                case DISCONNECTED:renderer.setColor(Color.BLACK);break;
-                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
-            }
-            if(l.selected)renderer.setColor(Color.MAROON);
-            renderer.rectLine(l.n1.x*20,l.n1.y*20,l.n2.x*20,l.n2.y*20,4);
-        }
         renderer.setColor(Color.LIGHT_GRAY);
         for(Node n:model.nodes.values()){
             if(n.on) {
@@ -65,18 +63,24 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
                 renderer.setColor(Color.DARK_GRAY);
             }
             if(n.id==model.nodes.size-1)renderer.setColor(Color.GREEN);
-            renderer.circle(n.x*20,n.y*20,4);
+            renderer.circle(n.x*20+4,n.y*20+4,nodeRadius);
+        }for(Link l:model.links){
+            switch (l.state){
+                case CONNECTED:renderer.setColor(Color.YELLOW);break;
+                case DISCONNECTED:renderer.setColor(Color.BLACK);break;
+                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
+            }
+            if(l.selected)renderer.setColor(Color.MAROON);
+            renderer.rect(l.rect.x,l.rect.y,l.rect.width,l.rect.height);
+            renderer.rectLine(l.n1.x * 20 + 4, l.n1.y * 20 + 4, l.n2.x * 20 + 4, l.n2.y * 20 + 4, logWidth);
         }
         renderer.end();
         }
 
     @Override
     public void resize(int w, int h){
-        Gdx.app.log("Main", w+" "+h);
-        cam.viewportWidth = mapHeight*w/h;
-        cam.viewportHeight = mapWidth;
-        cam.position.set(50, mapHeight / 2f, 0);
-        cam.update();
+        Gdx.app.log("Main", w + " " + h);
+        viewport.update(w, h, true);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Vector3 v = cam.unproject(new Vector3(screenX,screenY,0));
+        Vector3 v = viewport.unproject(new Vector3(screenX,screenY,0));
         Rectangle clickBox = new Rectangle(v.x,v.y,1,1);
         Link clickedLink = null;
 
