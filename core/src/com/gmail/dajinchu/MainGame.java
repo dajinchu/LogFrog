@@ -101,7 +101,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 v = viewport.unproject(new Vector3(screenX,screenY,0));
         Rectangle clickBox = new Rectangle(v.x,v.y,1,1);
-        Link clickedLink = null;
+        Link[] clickedLinks = new Link[3];
 
         //Debug:
         Gdx.app.log("Input", screenX+","+screenY);
@@ -110,26 +110,36 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         for(Link link:model.links)Gdx.app.log("Links", link.n1.id+" "+link.n2.id+" "+link.state);
         for(LinkSpace ln:model.linknodes)Gdx.app.log("Placeholder Nodes", ln.id+" "+ln.x+" "+ln.y);
 
-
+        //lower the clickedLinks[x] number, the higher priority
         for(Link l : model.links){
             if(l.rect.overlaps(clickBox)){
                 Gdx.app.log("Clicked", "y");
-                clickedLink = l;
-                break;
+                if(l.state== Link.STATE.POTENTIAL){
+                    clickedLinks[0]=l;
+                }else if(l.selected){
+                    clickedLinks[2]=l;
+                }else{
+                    clickedLinks[1]=l;
+                }
             }
         }
-        if(clickedLink!=null){
-            model.selectLink(clickedLink);
-            if(model.nodes.get(model.nodes.size-1).on){
-                //Goal has been reached!
-                nextLevel();
+        for(int i = 0; i < clickedLinks.length; i++){
+            //clickedLinks is sorted by priority, lowest index is used and we return since we're done
+            if(clickedLinks[i]!=null){
+                model.selectLink(clickedLinks[i]);
+                if(model.nodes.get(model.nodes.size-1).on){
+                    //Goal has been reached!
+                    nextLevel();
+                }
+                model.updateHighlight();
+                return true;
             }
-        }else{
-            //If we just clicked away, clear the selected link
-            model.clearSelection();
         }
+        //Since we haven't returned from the for loop above, it means user clicked on nothing
+        //If we just clicked away, clear the selected link
+        model.clearSelection();
         model.updateHighlight();
-        return false;
+        return true;
     }
 
     public void nextLevel(){
