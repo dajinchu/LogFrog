@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame extends ApplicationAdapter implements InputProcessor{
@@ -41,7 +41,8 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         float h = Gdx.graphics.getHeight();
         mapWidth = (int) (4*20+nodeRadius*2);
         mapHeight = (int) (6*20+nodeRadius*2);
-        viewport = new ExtendViewport(mapWidth, mapHeight);
+        viewport = new FitViewport(mapWidth, mapHeight);
+
 
         prefs=Gdx.app.getPreferences("My Prefs");
         level = prefs.getInteger("level",1);
@@ -63,6 +64,15 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         renderer.rect(0,0,mapWidth,mapHeight);
         renderer.end();
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
+        for(Link l:model.links){
+            switch (l.state){
+                case CONNECTED:renderer.setColor(Color.YELLOW);break;
+                case DISCONNECTED:renderer.setColor(Color.BLACK);break;
+                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
+            }
+            if(l.selected)renderer.setColor(Color.MAROON);
+            renderer.rectLine(l.n1.x * 20 + 4, l.n1.y * 20 + 4, l.n2.x * 20 + 4, l.n2.y * 20 + 4, logWidth);
+        }
         renderer.setColor(Color.LIGHT_GRAY);
         for(Node n:model.nodes.values()){
             if(n.on) {
@@ -72,14 +82,6 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
             }
             if(n.id==model.nodes.size-1)renderer.setColor(Color.GREEN);
             renderer.circle(n.x*20+4,n.y*20+4,nodeRadius);
-        }for(Link l:model.links){
-            switch (l.state){
-                case CONNECTED:renderer.setColor(Color.YELLOW);break;
-                case DISCONNECTED:renderer.setColor(Color.BLACK);break;
-                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
-            }
-            if(l.selected)renderer.setColor(Color.MAROON);
-            renderer.rectLine(l.n1.x * 20 + 4, l.n1.y * 20 + 4, l.n2.x * 20 + 4, l.n2.y * 20 + 4, logWidth);
         }
         renderer.end();
         }
