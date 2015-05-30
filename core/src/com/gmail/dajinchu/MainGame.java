@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -26,6 +27,12 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     int level;
     private Viewport viewport;
 
+    public static AnalyticsHelper ah;
+
+    public MainGame(AnalyticsHelper ah) {
+        this.ah=ah;
+    }
+
     @Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -40,6 +47,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         level = prefs.getInteger("level",1);
 
         loadLevel(level);
+
         Gdx.input.setInputProcessor(this);
 	}
 
@@ -143,6 +151,12 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     }
 
     public void nextLevel(){
+        ah.sendCustomTiming("User Interaction", (int) TimeUtils.timeSinceMillis(model.loadedMillis),
+                "Time to finish a level", "Level "+level);
+
+        ah.sendEvent("Level Balance",
+                "Moves to finish a level", "Level "+level, model.movesToComplete);
+
         level++;
         prefs.putInteger("level",level);
         loadLevel(level);

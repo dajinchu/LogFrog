@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.SnapshotArray;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +21,10 @@ public class Model {
 
     int playerNode = 0;
     Link selected;
+
+    //Analytics
+    long loadedMillis;
+    int movesToComplete=0;
 
     public Model(FileHandle level){
         BufferedReader reader = level.reader(64);
@@ -64,6 +69,8 @@ public class Model {
         }
 
         updateHighlight();
+
+        loadedMillis= TimeUtils.millis();
     }
 
     public void selectLink(Link link){
@@ -76,6 +83,9 @@ public class Model {
             selected=null;
             link.state= Link.STATE.DISCONNECTED;
             playerNode=link.n1.id;
+
+            //Record for Analytics
+            movesToComplete++;
             return;
         }
         if(link.selected){
