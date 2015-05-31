@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame extends ApplicationAdapter implements InputProcessor{
-	SpriteBatch batch;
+    SpriteBatch batch;
 	private Model model;
     private ShapeRenderer renderer;
 
@@ -28,9 +28,11 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     private Viewport viewport;
 
     public static AnalyticsHelper ah;
+    private final SavedGameHelper sgh;
 
-    public MainGame(AnalyticsHelper ah) {
+    public MainGame(AnalyticsHelper ah, SavedGameHelper sgh) {
         this.ah=ah;
+        this.sgh=sgh;
     }
 
     @Override
@@ -44,10 +46,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         viewport = new FitViewport(mapWidth, mapHeight);
 
 
-        prefs=Gdx.app.getPreferences("My Prefs");
-        level = prefs.getInteger("level",1);
-
-        loadLevel(level);
+        /*prefs=Gdx.app.getPreferences("My Prefs");
+        level = prefs.getInteger("level",1);*/
+        sgh.load(this);
 
         Gdx.input.setInputProcessor(this);
 	}
@@ -58,6 +59,9 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
         batch.setProjectionMatrix(viewport.getCamera().combined);
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(model==null){
+            return;
+        }
 
         renderer.begin(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.BLACK);
@@ -160,12 +164,17 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
                 "Moves to finish a level", "Level "+level, model.movesToComplete);
 
         level++;
-        prefs.putInteger("level",level);
-        loadLevel(level);
+        loadLevel();
+
+        sgh.write(new byte[]{(byte) level});
     }
 
-    private void loadLevel(int lvl){
-        model = new Model(Gdx.files.internal("level"+lvl+".txt"));
+    public void loadLevel(int lvl){
+        level = lvl;
+        loadLevel();
+    }
+    private void loadLevel(){
+        model = new Model(Gdx.files.internal("level"+level+".txt"));
     }
 
     @Override
@@ -190,6 +199,6 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     @Override
     public void pause(){
-        prefs.flush();
+        //prefs.flush();
     }
 }

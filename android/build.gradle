@@ -2,9 +2,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'keystore'
-            keyPassword '6Parker'
+            storePassword System.getenv("KSTOREPWD")
+            keyPassword System.getenv("KEYPWD")
             storeFile file('C:/Users/Da-Jin/Programming/keystore.jks')
-            storePassword '6Parker'
         }
     }
     buildToolsVersion "21.1.2"
