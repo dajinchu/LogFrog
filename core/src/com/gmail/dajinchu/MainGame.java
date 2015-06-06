@@ -1,26 +1,37 @@
 package com.gmail.dajinchu;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class MainGame extends ApplicationAdapter implements InputProcessor{
+public class MainGame implements InputProcessor, Screen {
+    private final ScreenManager sm;
     SpriteBatch batch;
-	private Model model;
+    Model model;
     private ShapeRenderer renderer;
+    private ShapeRenderer debugRenderer;
+    private Stage uistage;
+    private Table table;
 
-    float nodeRadius=4, logWidth=4;
-    int mapHeight, mapWidth;
+    static float nodeRadius=4, logWidth=4;
+    static int mapHeight, mapWidth;
 
 
     Preferences prefs;
@@ -29,71 +40,103 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
 
     public static AnalyticsHelper ah;
     private final SavedGameHelper sgh;
+    private TextButton sync;
+    private GameView view;
+    private ScreenViewport uiviewport;
+    private Label moves;
 
-    public MainGame(AnalyticsHelper ah, SavedGameHelper sgh) {
+    public MainGame(ScreenManager sm, AnalyticsHelper ah, SavedGameHelper sgh) {
         this.ah=ah;
         this.sgh=sgh;
+        this.sm = sm;
+        sgh.load(this);
+
     }
 
     @Override
-	public void create () {
+	public void show () {
 		batch = new SpriteBatch();
         renderer = new ShapeRenderer();
+        debugRenderer = new ShapeRenderer();
+
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         mapWidth = (int) (4*20+nodeRadius*2);
         mapHeight = (int) (6*20+nodeRadius*2);
         viewport = new FitViewport(mapWidth, mapHeight);
 
+        uiviewport = new ScreenViewport();
+        uistage = new Stage();
+        table = new Table();
+        table.debugAll();
+        table.setFillParent(true);
+        table.top();
+        sync = new TextButton("Sync", sm.buttonStyle);
+        sync.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                sgh.load(MainGame.this);
+            }
+        });
+        moves = new Label("0",sm.labelStyle);
+
+        table.add(moves).left().top().expandX();
+        table.add(sync).right().top().expandX();
+        uistage.addActor(table);
+        view = new GameView(this);
+
 
         /*prefs=Gdx.app.getPreferences("My Prefs");
         level = prefs.getInteger("level",1);*/
-        sgh.load(this);
-
-        Gdx.input.setInputProcessor(this);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uistage);
+        multiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(multiplexer);
 	}
 
-	@Override
-	public void render () {
+    @Override
+	public void render (float delta) {
+        Gdx.app.log("Main", ""+viewport.getScreenHeight());
+        viewport.apply();
+
         renderer.setProjectionMatrix(viewport.getCamera().combined);
         batch.setProjectionMatrix(viewport.getCamera().combined);
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+        debugRenderer.setProjectionMatrix(viewport.getCamera().combined);
+		Gdx.gl.glClearColor(1f, 1f, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(model==null){
             return;
         }
+        batch.begin();
+        view.draw(batch);
+        batch.end();
 
-        renderer.begin(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(Color.BLACK);
-        renderer.rect(0,0,mapWidth,mapHeight);
-        renderer.end();
-		renderer.begin(ShapeRenderer.ShapeType.Filled);
-        for(Link l:model.links){
-            switch (l.state){
-                case CONNECTED:renderer.setColor(Color.YELLOW);break;
-                case DISCONNECTED:renderer.setColor(Color.BLACK);break;
-                case POTENTIAL:renderer.setColor(Color.LIGHT_GRAY);break;
-            }
-            if(l.selected)renderer.setColor(Color.MAROON);
-            renderer.rectLine(l.n1.x * 20 + 4, l.n1.y * 20 + 4, l.n2.x * 20 + 4, l.n2.y * 20 + 4, logWidth);
-        }
-        renderer.setColor(Color.LIGHT_GRAY);
-        for(Node n:model.nodes.values()){
-            if(n.on) {
-                renderer.setColor(Color.YELLOW);
-            }else{
-                renderer.setColor(Color.DARK_GRAY);
-            }
-            if(n.id==model.nodes.size-1)renderer.setColor(Color.GREEN);
-            renderer.circle(n.x*20+4,n.y*20+4,nodeRadius);
-        }
-        renderer.end();
-        }
+        //.apply changes the "active" viewport. SO IMPORTANT, and NOT ON DOCUMENTATION
+        uiviewport.apply();
+        uistage.act(Gdx.graphics.getDeltaTime());
+        uistage.draw();
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        debugRenderer.line(50,50,79,50);
+        debugRenderer.end();
+
+    }
 
     @Override
     public void resize(int w, int h){
-        Gdx.app.log("Main", w + " " + h);
-        viewport.update(w, h, true);
+        Gdx.app.log("Main", w + " " + h+" sync "+sync.getHeight());
+        uiviewport.update(w,h,true);
+        viewport.update(w, (int) (h - sync.getHeight()), true);
+        Gdx.app.log("Main", "" + viewport.getScreenHeight());
+        Gdx.app.log("Main", "" + viewport.getScreenHeight());
+        uistage.setViewport(uiviewport);
+        Gdx.app.log("Main", "" + viewport.getScreenHeight());
+        if(viewport.getCamera()==uiviewport.getCamera()) Gdx.app.log("Main", "camera");
+
+        /*
+        float translate =viewport.unproject(new Vector3(0,h-viewport.project(new Vector2(0,mapHeight)).y,0)).y;
+        Gdx.app.log("Main", "translate "+translate+"height "+h+" map "+viewport.project(new Vector2(0,mapHeight)).y);
+        viewport.getCamera().translate(0,5,0);
+        viewport.getCamera().update();*/
     }
 
     @Override
@@ -146,6 +189,7 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
                     //Goal has been reached!
                     nextLevel();
                 }
+                moves.setText(model.movesToComplete+"");
                 return true;
             }
         }
@@ -200,5 +244,22 @@ public class MainGame extends ApplicationAdapter implements InputProcessor{
     @Override
     public void pause(){
         //prefs.flush();
+        //sgh.write(new byte[]{(byte) level});
+
     }
+
+    @Override
+    public void resume(){
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
 }

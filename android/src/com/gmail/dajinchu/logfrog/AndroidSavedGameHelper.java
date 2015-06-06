@@ -12,7 +12,6 @@ import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Da-Jin on 5/30/2015.
@@ -22,8 +21,6 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
 
     private final GoogleApiClient mGoogleApiClient;
     private String TAG = "Savegamehelper";
-
-    public final CountDownLatch apiLoaded = new CountDownLatch(1);
 
     public AndroidSavedGameHelper(GoogleApiClient GAC){
         mGoogleApiClient = GAC;
@@ -69,11 +66,6 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
 
             @Override
             protected Integer doInBackground(Void... params) {
-                try {
-                    apiLoaded.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 // Open the saved game using its name.
                 Snapshots.OpenSnapshotResult result = Games.Snapshots.open(mGoogleApiClient,
                         "default", true).await();

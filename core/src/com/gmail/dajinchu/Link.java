@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
  */
 public class Link {
     private final Model model;
+    boolean horizontal;
     Node n1,n2;
     int distance;
     boolean selected=false;
@@ -26,7 +27,6 @@ public class Link {
                     l.n1.equals(n2)&&l.n2.equals(n1))return;
         }
         model.links.add(this);
-        boolean horizontal;
         this.n1=n1;
         this.n2=n2;
         if(n1.x==n2.x){
