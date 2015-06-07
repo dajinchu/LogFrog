@@ -20,7 +20,7 @@ public class GameView {
     public GameView(MainGame game){
         this.game = game;
         link = new Texture("link.png");
-        node = new Texture("ship2.png");
+        node = new Texture("ship3.png");
         linkregion = new TextureRegion(link);
     }
 
@@ -31,7 +31,7 @@ public class GameView {
         for(Link l:model.links){
             switch (l.state){
                 case CONNECTED:batch.setColor(Color.YELLOW);break;
-                case DISCONNECTED:batch.setColor(Color.BLACK);break;
+                case DISCONNECTED:batch.setColor(Color.WHITE);break;
                 case POTENTIAL:batch.setColor(Color.LIGHT_GRAY);break;
             }
             if(l.selected)batch.setColor(Color.MAROON);
@@ -47,7 +47,7 @@ public class GameView {
             if(n.on) {
                 batch.setColor(Color.YELLOW);
             }else{
-                batch.setColor(Color.BLACK);
+                batch.setColor(Color.WHITE);
             }
             if(n.id==model.nodes.size-1)batch.setColor(Color.GREEN);
             batch.draw(node, n.x * 20, n.y * 20, MainGame.nodeRadius * 2, MainGame.nodeRadius * 2);

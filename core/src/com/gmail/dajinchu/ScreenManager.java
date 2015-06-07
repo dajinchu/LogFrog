@@ -37,16 +37,18 @@ public class ScreenManager extends Game {
 
         Gdx.app.log("SM", Gdx.graphics.getWidth()+" "+fontSmall.getSpaceWidth());
 
-        NinePatchDrawable patch =new NinePatchDrawable(new NinePatch(new Texture("button.png"),2,2,2,2));
+        NinePatchDrawable buttonup =new NinePatchDrawable(new NinePatch(new Texture("buttonup.png"),1,1,1,1));
+        NinePatchDrawable buttondown =new NinePatchDrawable(new NinePatch(new Texture("buttondown.png"),1,1,1,1));
         labelStyle = new Label.LabelStyle();
         labelStyle.font=fontSmall;
-        labelStyle.fontColor=Color.BLACK;
-        labelStyle.background = patch;
+        labelStyle.fontColor=Color.WHITE;
+
         buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = fontSmall;
-        buttonStyle.fontColor= Color.BLACK;
-        buttonStyle.up=patch;
-        buttonStyle.down=patch;
+        buttonStyle.downFontColor= Color.BLACK;
+        buttonStyle.fontColor=Color.WHITE;
+        buttonStyle.up=buttonup;
+        buttonStyle.down=buttondown;
 
 
         setScreen(menuScreen);

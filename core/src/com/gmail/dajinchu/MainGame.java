@@ -43,7 +43,7 @@ public class MainGame implements InputProcessor, Screen {
     private TextButton sync;
     private GameView view;
     private ScreenViewport uiviewport;
-    private Label moves;
+    private Label levelinfo;
 
     public MainGame(ScreenManager sm, AnalyticsHelper ah, SavedGameHelper sgh) {
         this.ah=ah;
@@ -68,7 +68,6 @@ public class MainGame implements InputProcessor, Screen {
         uiviewport = new ScreenViewport();
         uistage = new Stage();
         table = new Table();
-        table.debugAll();
         table.setFillParent(true);
         table.top();
         sync = new TextButton("Sync", sm.buttonStyle);
@@ -78,9 +77,9 @@ public class MainGame implements InputProcessor, Screen {
                 sgh.load(MainGame.this);
             }
         });
-        moves = new Label("0",sm.labelStyle);
+        levelinfo = new Label("Level "+level+"  Moves: 0",sm.labelStyle);
 
-        table.add(moves).left().top().expandX();
+        table.add(levelinfo).left().top().expandX();
         table.add(sync).right().top().expandX();
         uistage.addActor(table);
         view = new GameView(this);
@@ -102,7 +101,7 @@ public class MainGame implements InputProcessor, Screen {
         renderer.setProjectionMatrix(viewport.getCamera().combined);
         batch.setProjectionMatrix(viewport.getCamera().combined);
         debugRenderer.setProjectionMatrix(viewport.getCamera().combined);
-		Gdx.gl.glClearColor(1f, 1f, 1f, 1);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(model==null){
             return;
@@ -115,9 +114,6 @@ public class MainGame implements InputProcessor, Screen {
         uiviewport.apply();
         uistage.act(Gdx.graphics.getDeltaTime());
         uistage.draw();
-        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        debugRenderer.line(50,50,79,50);
-        debugRenderer.end();
 
     }
 
@@ -189,7 +185,7 @@ public class MainGame implements InputProcessor, Screen {
                     //Goal has been reached!
                     nextLevel();
                 }
-                moves.setText(model.movesToComplete+"");
+                levelinfo.setText("Level "+level+"  Moves: "+model.movesToComplete);
                 return true;
             }
         }
