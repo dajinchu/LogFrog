@@ -43,6 +43,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private ScreenManager sm;
     private TextButton startGame;
     private MainGame maingame;
+    private TextButton GPGS;
 
     public AndroidMainMenu(AndroidLauncher context){
         this.context = context;
@@ -78,11 +79,11 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         table = new Table();
         table.setFillParent(true);
 
-        TextButton GPGS = new TextButton("Google Play Games", sm.buttonStyle);
+        GPGS = new TextButton("Sign Out of G+", sm.buttonStyle);
         GPGS.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                mSignInClicked=true;
+                toggleSignIn();
             }
         });
         startGame = new TextButton("Start", sm.buttonStyle);
@@ -94,13 +95,29 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             }
         });
         startGame.setVisible(false);
+        GPGS.setVisible(false);
 
         table.add(GPGS);
+        table.row();
         table.add(startGame);
 
         stage.addActor(table);
 
         shapeRenderer = new ShapeRenderer();
+
+    }
+
+    public void toggleSignIn(){
+        if(mSignInClicked){
+            mSignInClicked=false;
+            mGoogleApiClient.disconnect();
+            startGame.setVisible(false);
+            GPGS.setText("Sign Into G+");
+        }else{
+            GPGS.setText("Sign Out of G+");
+            mGoogleApiClient.connect();
+            mSignInClicked=true;
+        }
 
     }
 
@@ -156,7 +173,8 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void onConnected(Bundle bundle) {
-        startGame.setVisible(true);
+        startGame.setVisible(true);//TODO getting null pointers!
+        GPGS.setVisible(true);
         maingame = new MainGame(sm,
                 new AndroidAnalyticsHelper(context),
                 new AndroidSavedGameHelper(mGoogleApiClient));
