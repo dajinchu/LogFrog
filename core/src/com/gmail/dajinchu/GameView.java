@@ -19,8 +19,8 @@ public class GameView {
 
     public GameView(MainGame game){
         this.game = game;
-        link = new Texture("link.png");
-        node = new Texture("ship3.png");
+        link = new Texture("white.png");
+        node = new Texture("ship2.png");
         linkregion = new TextureRegion(link);
     }
 

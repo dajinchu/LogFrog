@@ -215,6 +215,7 @@ public class MainGame implements InputProcessor, Screen {
     }
     private void loadLevel(){
         model = new Model(Gdx.files.internal("level"+level+".txt"));
+        levelinfo.setText("Level "+level+"  Moves: 0");
     }
 
     @Override
