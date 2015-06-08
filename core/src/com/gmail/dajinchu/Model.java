@@ -1,6 +1,5 @@
 package com.gmail.dajinchu;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
@@ -59,15 +58,6 @@ public class Model {
             e.printStackTrace();
         }
 
-        Gdx.app.log("Model",level.readString());
-
-        for(Node n:nodes.values()){
-            Gdx.app.log("Model", "Node at "+n.x+","+n.y);
-        }
-        for(Link l:links){
-            Gdx.app.log("Model", "Link at "+l.n1.x+","+l.n1.y+"->"+l.n2.x+","+l.n2.y);
-        }
-
         updateHighlight();
 
         loadedMillis= TimeUtils.millis();
@@ -110,7 +100,6 @@ public class Model {
             if(link.state== Link.STATE.POTENTIAL||link.selected)continue;
             int deltax = (link.n1.x-link.n2.x)/link.distance;
             int deltay = (link.n1.y-link.n2.y)/link.distance;
-            Gdx.app.log("reclalc linknodes", deltax+" "+deltay);
             for(int i = 1; i < link.distance; i++){
                 new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i, this);
             }

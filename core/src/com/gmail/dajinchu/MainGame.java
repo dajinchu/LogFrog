@@ -98,7 +98,6 @@ public class MainGame implements InputProcessor, Screen {
 
     @Override
 	public void render (float delta) {
-        Gdx.app.log("Main", ""+viewport.getScreenHeight());
         viewport.apply();
 
         renderer.setProjectionMatrix(viewport.getCamera().combined);
@@ -122,15 +121,9 @@ public class MainGame implements InputProcessor, Screen {
 
     @Override
     public void resize(int w, int h){
-        Gdx.app.log("Main", w + " " + h+" sync "+sync.getHeight());
-        uiviewport.update(w,h,true);
+        uiviewport.update(w, h, true);
         viewport.update(w, (int) (h - sync.getHeight()), true);
-        Gdx.app.log("Main", "" + viewport.getScreenHeight());
-        Gdx.app.log("Main", "" + viewport.getScreenHeight());
         uistage.setViewport(uiviewport);
-        Gdx.app.log("Main", "" + viewport.getScreenHeight());
-        if(viewport.getCamera()==uiviewport.getCamera()) Gdx.app.log("Main", "camera");
-
         /*
         float translate =viewport.unproject(new Vector3(0,h-viewport.project(new Vector2(0,mapHeight)).y,0)).y;
         Gdx.app.log("Main", "translate "+translate+"height "+h+" map "+viewport.project(new Vector2(0,mapHeight)).y);
@@ -158,13 +151,6 @@ public class MainGame implements InputProcessor, Screen {
         Vector3 v = viewport.unproject(new Vector3(screenX,screenY,0));
         Rectangle clickBox = new Rectangle(v.x,v.y,1,1);
         Link[] clickedLinks = new Link[3];
-
-        //Debug:
-        Gdx.app.log("Input", screenX+","+screenY);
-        Gdx.app.log("Input", v.x+","+v.y);
-        for(Node n:model.nodes.values())Gdx.app.log("Nodes", n.id+" "+n.x+" "+n.y);
-        for(Link link:model.links)Gdx.app.log("Links", link.n1.id+" "+link.n2.id+" "+link.state);
-        for(LinkSpace ln:model.linknodes)Gdx.app.log("Placeholder Nodes", ln.id+" "+ln.x+" "+ln.y);
 
         //lower the clickedLinks[x] number, the higher priority
         for(Link l : model.links){

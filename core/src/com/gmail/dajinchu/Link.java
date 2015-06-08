@@ -1,6 +1,5 @@
 package com.gmail.dajinchu;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
@@ -74,7 +73,6 @@ public class Link {
             left-=WIDTH/2;
             bottom+=8/2;
         }
-        Gdx.app.log("Rect Create",horizontal+" "+left+" "+bottom+" "+width+" "+height);
         rect = new Rectangle(left+4, bottom, width, height);
 
 

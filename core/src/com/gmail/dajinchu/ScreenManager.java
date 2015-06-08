@@ -35,8 +35,6 @@ public class ScreenManager extends Game {
         FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
         BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth()*.05f));
 
-        Gdx.app.log("SM", Gdx.graphics.getWidth()+" "+fontSmall.getSpaceWidth());
-
         NinePatchDrawable buttonup =new NinePatchDrawable(new NinePatch(new Texture("buttonup.png"),1,1,1,1));
         NinePatchDrawable buttondown =new NinePatchDrawable(new NinePatch(new Texture("buttondown.png"),1,1,1,1));
         labelStyle = new Label.LabelStyle();

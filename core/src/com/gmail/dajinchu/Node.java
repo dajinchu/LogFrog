@@ -1,6 +1,5 @@
 package com.gmail.dajinchu;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.SnapshotArray;
 
 /**
@@ -24,7 +23,6 @@ public class Node {
     }
 
     public void traverseNode(Link selected){
-        Gdx.app.log("traversingNode", x+" "+y);
         on=true;
         Object[] l = connected.begin();
         for(int i = 0, n = connected.size; i < n; i++){
@@ -43,14 +41,12 @@ public class Node {
         }
     }
     public void checkDirection(int dirx, int diry, int dist){
-        Gdx.app.log("Checking dir", "me "+x+","+y+" to "+(x + dirx * dist)+" "+(y + diry * dist));
         //Everything on the way must be empty
         for(int i = 1; i < dist; i++){
             try {
                 Node temp =model.nodegrid[x + i * dirx][y + i * diry];
                 //Gdx.app.log("Checking in the way", temp.x+" "+temp.y);
                 if (model.nodegrid[x + i * dirx][y + i * diry] != null) {
-                    Gdx.app.log("Way", temp.x+" "+temp.y+" is in the way");
                     return;
                 }
             }catch (ArrayIndexOutOfBoundsException e){
@@ -59,7 +55,6 @@ public class Node {
         }
         try {
             if (model.nodegrid[x + dirx * dist][y + diry * dist]!=null&&model.nodegrid[x + dirx * dist][y + diry * dist].solid()) {
-                Gdx.app.log("Making link",(x + dirx * dist)+" "+(y + diry * dist));
                 new Link(this, model.nodegrid[x + dirx * dist][y + diry * dist], model).state = Link.STATE.POTENTIAL;
             }
         }catch (ArrayIndexOutOfBoundsException e){
