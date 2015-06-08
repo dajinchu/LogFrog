@@ -35,7 +35,7 @@ public class MainGame implements InputProcessor, Screen {
 
 
     Preferences prefs;
-    int level;
+    public int level = 1;
     private Viewport viewport;
 
     public static AnalyticsHelper ah;
@@ -84,6 +84,9 @@ public class MainGame implements InputProcessor, Screen {
         uistage.addActor(table);
         view = new GameView(this);
 
+
+        //Now that levelinfo is instantiated, it is safe to load level
+        loadLevel();
 
         /*prefs=Gdx.app.getPreferences("My Prefs");
         level = prefs.getInteger("level",1);*/
@@ -209,10 +212,6 @@ public class MainGame implements InputProcessor, Screen {
         sgh.write(new byte[]{(byte) level});
     }
 
-    public void loadLevel(int lvl){
-        level = lvl;
-        loadLevel();
-    }
     private void loadLevel(){
         model = new Model(Gdx.files.internal("level"+level+".txt"));
         levelinfo.setText("Level "+level+"  Moves: 0");

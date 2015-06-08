@@ -14,6 +14,6 @@ public class DesktopSavedGameHelper implements SavedGameHelper {
 
     @Override
     public void load(MainGame game) {
-        game.loadLevel(1);
+        game.level=(1);
     }
 }

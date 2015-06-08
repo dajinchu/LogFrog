@@ -34,7 +34,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private Table table;
     private Stage stage;
 
-    private final GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient;
     private final AndroidLauncher context;
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInFlow = true;
@@ -45,16 +45,9 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private MainGame maingame;
     private TextButton GPGS;
 
+
     public AndroidMainMenu(AndroidLauncher context){
         this.context = context;
-
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
-                .build();
 
     }
     @Override
@@ -105,20 +98,41 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
         shapeRenderer = new ShapeRenderer();
 
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
+                .build();
+        onStart();
     }
 
     public void toggleSignIn(){
-        if(mSignInClicked){
+        if(mGoogleApiClient.isConnecting())return;
+        if(mGoogleApiClient.isConnected()){
+            //Sign out
             mSignInClicked=false;
+            Games.signOut(mGoogleApiClient);
             mGoogleApiClient.disconnect();
             startGame.setVisible(false);
-            GPGS.setText("Sign Into G+");
+            showSignIn();
         }else{
-            GPGS.setText("Sign Out of G+");
+            //Sign in
+            Gdx.app.log("MainMenu", "signing in");
             mGoogleApiClient.connect();
             mSignInClicked=true;
         }
 
+    }
+
+    public void showSignIn(){
+        mSignInClicked=false;
+        GPGS.setText("Sign Into G+");
+    }
+
+    public void showSignOut(){
+        GPGS.setText("Sign Out of G+");
     }
 
     @Override
@@ -173,7 +187,8 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void onConnected(Bundle bundle) {
-        startGame.setVisible(true);//TODO getting null pointers!
+        showSignOut();
+        startGame.setVisible(true);
         GPGS.setVisible(true);
         maingame = new MainGame(sm,
                 new AndroidAnalyticsHelper(context),
@@ -211,6 +226,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
                 mResolvingConnectionFailure = false;
             }
         }
+        showSignIn();
     }
 
     @Override

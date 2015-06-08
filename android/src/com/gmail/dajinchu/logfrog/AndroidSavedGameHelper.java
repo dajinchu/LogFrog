@@ -83,11 +83,16 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
                     Log.e(TAG, "Error while loading: " + result.getStatus().getStatusCode());
                 }
 
+
                 return result.getStatus().getStatusCode();
             }
             @Override
             protected void onPostExecute(Integer status){
-                game.loadLevel((int)mSaveGameData[0]);
+                if(mSaveGameData.length==0){
+                    game.level=1;
+                }else {
+                    game.level = (int) mSaveGameData[0];
+                }
             }
         };
         load.execute();
