@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class MainGame implements InputProcessor, Screen {
+public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private final ScreenManager sm;
     SpriteBatch batch;
     Model model;
@@ -35,11 +35,11 @@ public class MainGame implements InputProcessor, Screen {
 
 
     Preferences prefs;
-    public int level = 1;
+    public int level;
     private Viewport viewport;
 
     public static AnalyticsHelper ah;
-    private final SavedGameHelper sgh;
+    public final SavedGameHelper sgh;
     private TextButton sync;
     private GameView view;
     private ScreenViewport uiviewport;
@@ -49,7 +49,8 @@ public class MainGame implements InputProcessor, Screen {
         this.ah=ah;
         this.sgh=sgh;
         this.sm = sm;
-        sgh.load(this);
+        prefs=Gdx.app.getPreferences("My Prefs");
+        level = prefs.getInteger("level",1);
 
     }
 
@@ -84,12 +85,10 @@ public class MainGame implements InputProcessor, Screen {
         uistage.addActor(table);
         view = new GameView(this);
 
-
         //Now that levelinfo is instantiated, it is safe to load level
+        sgh.load(this);
         loadLevel();
 
-        /*prefs=Gdx.app.getPreferences("My Prefs");
-        level = prefs.getInteger("level",1);*/
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uistage);
         multiplexer.addProcessor(this);
@@ -196,6 +195,7 @@ public class MainGame implements InputProcessor, Screen {
         loadLevel();
 
         sgh.write(new byte[]{(byte) level});
+        prefs.putInteger("level", level);
     }
 
     private void loadLevel(){
@@ -225,13 +225,14 @@ public class MainGame implements InputProcessor, Screen {
 
     @Override
     public void pause(){
-        //prefs.flush();
+        prefs.flush();
         //sgh.write(new byte[]{(byte) level});
 
     }
 
     @Override
     public void resume(){
+
     }
 
     @Override
@@ -244,4 +245,21 @@ public class MainGame implements InputProcessor, Screen {
 
     }
 
+    @Override
+    public void onGameLoad(byte[] data) {
+        if(level==data[0]){
+            //Local and cloud copy are the same, don't load level
+            return;
+        }
+        if(level>data[0]){
+            //local copy is ahead of cloud. update the cloud version
+            sgh.write(new byte[]{(byte) level});
+        }else{
+            //catch up with cloud copy
+            level = data[0];
+            loadLevel();
+            prefs.putInteger("level", level);
+        }
+
+    }
 }

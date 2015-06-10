@@ -84,10 +84,12 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 AndroidMainMenu.this.dispose();
+                maingame = new MainGame(sm,
+                        new AndroidAnalyticsHelper(context),
+                        new AndroidSavedGameHelper(mGoogleApiClient));
                 sm.setScreen(maingame);
             }
         });
-        startGame.setVisible(false);
         GPGS.setVisible(false);
 
         table.add(GPGS);
@@ -98,6 +100,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
         shapeRenderer = new ShapeRenderer();
 
+        Gdx.app.log("MainMenu","show");
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -115,7 +118,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             mSignInClicked=false;
             Games.signOut(mGoogleApiClient);
             mGoogleApiClient.disconnect();
-            startGame.setVisible(false);
             showSignIn();
         }else{
             //Sign in
@@ -147,9 +149,11 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void resume() {
+        Gdx.app.log("MainMenu","resume");
     }
 
     public void onStart(){
+        Gdx.app.log("MainMenu","start");
         if (mGoogleApiClient != null) {
 
             mGoogleApiClient.connect();
@@ -188,11 +192,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     @Override
     public void onConnected(Bundle bundle) {
         showSignOut();
-        startGame.setVisible(true);
         GPGS.setVisible(true);
-        maingame = new MainGame(sm,
-                new AndroidAnalyticsHelper(context),
-                new AndroidSavedGameHelper(mGoogleApiClient));
     }
 
     @Override

@@ -3,8 +3,8 @@ package com.gmail.dajinchu.logfrog;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.SavedGameHelper;
+import com.gmail.dajinchu.SavedGameListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.snapshot.Snapshot;
@@ -28,6 +28,7 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
 
     @Override
     public void write(final byte[] data) {
+        if(!mGoogleApiClient.isConnected())return;
         AsyncTask<Void, Void, Boolean> write = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -59,7 +60,8 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
     }
 
     @Override
-    public void load(final MainGame game) {
+    public void load(final SavedGameListener game) {
+        if(!mGoogleApiClient.isConnected())return;
 
         AsyncTask<Void, Void, Integer> load = new AsyncTask<Void, Void, Integer>() {
             public byte[] mSaveGameData;
@@ -88,10 +90,10 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
             }
             @Override
             protected void onPostExecute(Integer status){
-                if(mSaveGameData.length==0){
-                    game.level=1;
+                if(mSaveGameData.length<1){
+                    game.onGameLoad(new byte[]{(byte) 1});
                 }else {
-                    game.level = (int) mSaveGameData[0];
+                    game.onGameLoad(mSaveGameData);
                 }
             }
         };

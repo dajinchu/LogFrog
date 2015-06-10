@@ -5,5 +5,5 @@ package com.gmail.dajinchu;
  */
 public interface SavedGameHelper {
     public void write(byte[] data);
-    void load(MainGame game);
+    void load(SavedGameListener game);
 }
