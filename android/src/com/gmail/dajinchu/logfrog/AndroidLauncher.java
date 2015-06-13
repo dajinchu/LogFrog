@@ -24,13 +24,13 @@ public class AndroidLauncher extends AndroidApplication {
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode=true;
         mainmenu = new AndroidMainMenu(this);
-        initialize(new ScreenManager(mainmenu), config);
+        ScreenManager sm = new ScreenManager(mainmenu);
+        initialize(sm, config);
 	}
 
     @Override
     public void onStart(){
         super.onStart();
-        mainmenu.onStart();
     }
 
     @Override
