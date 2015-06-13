@@ -71,6 +71,7 @@ public class ScreenManager extends Game {
     }
 
     public void mainmenu(){
+        prefs.flush();
         setScreen(menuScreen);
     }
 

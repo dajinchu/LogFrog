@@ -87,6 +87,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
                 maingame = new MainGame(sm,
                         new AndroidAnalyticsHelper(context),
                         new AndroidSavedGameHelper(mGoogleApiClient));
+                sm.prefs.flush();
                 sm.setScreen(maingame);
             }
         });

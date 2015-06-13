@@ -223,7 +223,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     @Override
     public boolean keyDown(int keycode) {
         if(keycode== Input.Keys.BACK){
-            sm.prefs.flush();
             sm.mainmenu();
         }
         return false;
