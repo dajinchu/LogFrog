@@ -34,6 +34,7 @@ public class ScreenManager extends Game {
     @Override
     public void create() {
         prefs=Gdx.app.getPreferences("My Prefs");
+        Gdx.input.setCatchBackKey(true);
 
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
@@ -57,6 +58,10 @@ public class ScreenManager extends Game {
         buttonStyle.down=buttondown;
 
 
+        setScreen(menuScreen);
+    }
+
+    public void mainmenu(){
         setScreen(menuScreen);
     }
 

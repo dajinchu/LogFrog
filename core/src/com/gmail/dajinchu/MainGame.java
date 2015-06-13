@@ -1,6 +1,7 @@
 package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -47,7 +48,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private GameView view;
     private ScreenViewport uiviewport;
     private Label levelinfo;
-    private TextButton mainmenu;
     private Table optionmenu;
 
     public MainGame(ScreenManager sm, AnalyticsHelper ah, SavedGameHelper sgh) {
@@ -121,11 +121,11 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         VerticalGroup options = new VerticalGroup();
         Image optionbackground = new Image(sm.buttonStyle.up);
         Label optiontitle = new Label("Options",sm.labelStyle);
-        mainmenu = new TextButton("Main Menu", sm.buttonStyle);
+        TextButton mainmenu = new TextButton("Main Menu", sm.buttonStyle);
         mainmenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                sm.setScreen(sm.menuScreen);
+                sm.mainmenu();
             }
         });
         options.pad(20);
@@ -140,8 +140,10 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         optionmenu.setDebug(true);
         uistage.addActor(optionmenu);
 
-
+        //This draws the actual gameplay
         view = new GameView(this);
+
+
 
         //Now that levelinfo is instantiated, it is safe to load level
         sgh.load(this);
@@ -193,6 +195,9 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
     @Override
     public boolean keyDown(int keycode) {
+        if(keycode== Input.Keys.BACK){
+            sm.mainmenu();
+        }
         return false;
     }
 
