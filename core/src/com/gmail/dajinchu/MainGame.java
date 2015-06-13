@@ -121,7 +121,14 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         VerticalGroup options = new VerticalGroup();
         Image optionbackground = new Image(sm.buttonStyle.up);
         Label optiontitle = new Label("Options",sm.labelStyle);
+        TextButton sync = new TextButton("Sync Play Games", sm.buttonStyle);
         TextButton mainmenu = new TextButton("Main Menu", sm.buttonStyle);
+        sync.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                sgh.load(MainGame.this);
+            }
+        });
         mainmenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -131,6 +138,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         options.pad(20);
         options.space(20);
         options.addActor(optiontitle);
+        options.addActor(sync);
         options.addActor(mainmenu);
 
         optionstack.add(optionbackground);
