@@ -3,7 +3,6 @@ package com.gmail.dajinchu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,7 +33,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     static int mapHeight, mapWidth;
 
 
-    Preferences prefs;
     public int level;
     private Viewport viewport;
 
@@ -49,8 +47,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         this.ah=ah;
         this.sgh=sgh;
         this.sm = sm;
-        prefs=Gdx.app.getPreferences("My Prefs");
-        level = prefs.getInteger("level",1);
+        level = sm.prefs.getInteger("level",1);
 
     }
 
@@ -195,7 +192,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         loadLevel();
 
         sgh.write(new byte[]{(byte) level});
-        prefs.putInteger("level", level);
+        sm.prefs.putInteger("level", level);
     }
 
     private void loadLevel(){
@@ -225,7 +222,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
     @Override
     public void pause(){
-        prefs.flush();
         //sgh.write(new byte[]{(byte) level});
 
     }
@@ -258,7 +254,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
             //catch up with cloud copy
             level = data[0];
             loadLevel();
-            prefs.putInteger("level", level);
+            sm.prefs.putInteger("level", level);
         }
 
     }

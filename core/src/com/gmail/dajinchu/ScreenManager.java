@@ -2,12 +2,14 @@ package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
@@ -18,9 +20,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 public class ScreenManager extends Game {
     MainMenu menuScreen;
     public SpriteBatch batch;
+    public ShapeRenderer renderer;
+
     public BitmapFont font;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle buttonStyle;
+    public Preferences prefs;
 
     public ScreenManager(MainMenu menuScreen){
         this.menuScreen = menuScreen;
@@ -28,7 +33,10 @@ public class ScreenManager extends Game {
     }
     @Override
     public void create() {
+        prefs=Gdx.app.getPreferences("My Prefs");
+
         batch = new SpriteBatch();
+        renderer = new ShapeRenderer();
         font = new BitmapFont();
 
         SmartFontGenerator fontGenerator = new SmartFontGenerator();
@@ -53,6 +61,11 @@ public class ScreenManager extends Game {
     }
 
     @Override
+    public void pause(){
+        prefs.flush();
+    }
+
+    @Override
     public void render(){
         super.render();
     }
@@ -61,6 +74,7 @@ public class ScreenManager extends Game {
     public void dispose(){
         font.dispose();
         batch.dispose();
+        renderer.dispose();
     }
 }
 
