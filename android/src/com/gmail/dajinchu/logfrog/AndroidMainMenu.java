@@ -7,12 +7,16 @@ import android.util.Log;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.MainMenu;
 import com.gmail.dajinchu.ScreenManager;
@@ -28,9 +32,6 @@ import com.google.example.games.basegameutils.BaseGameUtils;
  */
 public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    //debug
-    private ShapeRenderer shapeRenderer;
-
     private Table table;
     private Stage stage;
 
@@ -43,7 +44,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private ScreenManager sm;
     private TextButton startGame;
     private MainGame maingame;
-    private TextButton GPGS;
+    private ImageTextButton GPGS;
 
 
     public AndroidMainMenu(AndroidLauncher context){
@@ -55,9 +56,9 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-
-        table.drawDebug(shapeRenderer);
-
+        sm.renderer.begin(ShapeRenderer.ShapeType.Line);
+        table.drawDebug(sm.renderer);
+        sm.renderer.end();
     }
 
     @Override
@@ -71,15 +72,18 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         Gdx.input.setInputProcessor(stage);
         table = new Table();
         table.setFillParent(true);
+        table.pad(10);
 
-        GPGS = new TextButton("Sign Out of G+", sm.buttonStyle);
+        ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle(sm.buttonStyle);
+        style.imageUp=new TextureRegionDrawable(new TextureRegion(new Texture("games_icon.png")));
+        GPGS = new ImageTextButton("LOGIN", style);
         GPGS.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 toggleSignIn();
             }
         });
-        startGame = new TextButton("Start", sm.buttonStyle);
+        startGame = new TextButton("Play", sm.buttonStyle);
         startGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -92,13 +96,12 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         });
         GPGS.setVisible(false);
 
-        table.add(GPGS);
+        table.add(GPGS).expand().top().right();
         table.row();
-        table.add(startGame);
+        table.add(startGame).expandY().top();
+        table.setDebug(true);
 
         stage.addActor(table);
-
-        shapeRenderer = new ShapeRenderer();
 
         Gdx.app.log("MainMenu","show");
         mGoogleApiClient = new GoogleApiClient.Builder(context)
@@ -130,11 +133,13 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     public void showSignIn(){
         mSignInClicked=false;
-        GPGS.setText("Sign Into G+");
+        GPGS.setText("LOGIN");
+        sm.prefs.putBoolean("gpgs",false);
     }
 
     public void showSignOut(){
-        GPGS.setText("Sign Out of G+");
+        GPGS.setText("LOGOUT");
+        sm.prefs.putBoolean("gpgs",true);
     }
 
     @Override
@@ -149,10 +154,17 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void resume() {
-        Gdx.app.log("MainMenu","resume");
+        Gdx.app.log("MainMenu", "resume");
     }
 
     public void onStart(){
+        //If Games Services sign in is false, return and don't pester the user
+        if(!sm.prefs.getBoolean("gpgs",true)){
+            GPGS.setVisible(true);
+            showSignIn();
+            return;
+        }
+
         Gdx.app.log("MainMenu","start");
         if (mGoogleApiClient != null) {
 
@@ -186,7 +198,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     @Override
     public void dispose() {
         stage.dispose();
-        shapeRenderer.dispose();
     }
 
     @Override
