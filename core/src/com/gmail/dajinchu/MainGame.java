@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private final ScreenManager sm;
+    private final boolean signedin;
     public boolean hints;
     SpriteBatch batch;
     Model model;
@@ -56,7 +57,8 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         this.sgh=sgh;
         this.sm = sm;
         level = sm.prefs.getInteger("level",1);
-        hints = sm.prefs.getBoolean("hints",true);
+        hints = sm.prefs.getBoolean("hints", true);
+        signedin = sm.prefs.getBoolean("gpgs", false);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 optionmenu.setVisible(true);
+
                 final InputListener optionlistener = new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -94,9 +97,9 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
                     }
                 };
                 optionmenu.addListener(optionlistener);
-                uistage.addListener(new InputListener(){
+                uistage.addListener(new InputListener() {
                     @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                         //Closes the options menu and unregisters these two listeners when anything
                         //is clicked, except if it is the menu box getting clicked, in which case
                         //the event is stopped by the previous listener
@@ -160,7 +163,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         options.space(20);
         options.addActor(optiontitle);
         options.addActor(togglehints);
-        options.addActor(sync);
+        if(signedin)options.addActor(sync);
         options.addActor(mainmenu);
 
         optionstack.add(optionbackground);
