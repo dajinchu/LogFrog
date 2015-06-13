@@ -1,5 +1,6 @@
 package com.gmail.dajinchu;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
@@ -35,7 +36,7 @@ public class Link {
             horizontal=true;
             distance=Math.abs(n1.x-n2.x);
         }else{
-            throw new RuntimeException("Fuck me, tried to connect log diagonally! DAMN");
+            Gdx.app.error("Link", "diaganal between link "+n1.id+" and "+n2.id);
         }
         n1.connected.add(this);
         n2.connected.add(this);
