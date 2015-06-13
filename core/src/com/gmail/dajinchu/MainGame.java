@@ -338,6 +338,16 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     }
 
     @Override
+    public int resolveConflict(byte[] data0, byte[] data1){
+        int level0 = data0[0], level1 = data1[0];
+        if(level0>=level1){
+            return 0;
+        }else{
+            return 1;
+        }
+    }
+
+    @Override
     public void onGameLoad(byte[] data) {
         if(level==data[0]){
             //Local and cloud copy are the same, don't load level

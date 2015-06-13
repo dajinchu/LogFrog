@@ -7,6 +7,7 @@ import com.gmail.dajinchu.SavedGameHelper;
 import com.gmail.dajinchu.SavedGameListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
@@ -21,6 +22,7 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
 
     private final GoogleApiClient mGoogleApiClient;
     private String TAG = "Savegamehelper";
+    private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
 
     public AndroidSavedGameHelper(GoogleApiClient GAC){
         mGoogleApiClient = GAC;
@@ -72,8 +74,9 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
                 Snapshots.OpenSnapshotResult result = Games.Snapshots.open(mGoogleApiClient,
                         "default", true).await();
 
+                com.google.android.gms.common.api.Status status = result.getStatus();
                 // Check the result of the open operation
-                if (result.getStatus().isSuccess()) {
+                if (status.isSuccess()) {
                     Snapshot snapshot = result.getSnapshot();
                     // Read the byte content of the saved game.
                     try {
@@ -82,7 +85,14 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
                         Log.e(TAG, "Error while reading Snapshot.", e);
                     }
                 } else {
-                    Log.e(TAG, "Error while loading: " + result.getStatus().getStatusCode());
+                    Log.e(TAG, "Error while loading: " + status.getStatusCode());
+                    if(status.getStatusCode() == GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT){
+                        try {
+                            mSaveGameData = processSnapshotOpenResult(game, result, 0).getSnapshotContents().readFully();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
 
@@ -98,5 +108,47 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
             }
         };
         load.execute();
+    }
+    private Snapshot processSnapshotOpenResult(SavedGameListener game, Snapshots.OpenSnapshotResult result, int retryCount) {
+        Snapshot mResolvedSnapshot;
+        retryCount++;
+
+        int status = result.getStatus().getStatusCode();
+        Log.i(TAG, "Save Result status: " + status);
+
+        if (status == GamesStatusCodes.STATUS_OK) {
+            return result.getSnapshot();
+        } else if (status == GamesStatusCodes.STATUS_SNAPSHOT_CONTENTS_UNAVAILABLE) {
+            return result.getSnapshot();
+        } else if (status == GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT) {
+            Snapshot snapshot = result.getSnapshot();
+            Snapshot conflictSnapshot = result.getConflictingSnapshot();
+
+            mResolvedSnapshot = snapshot;
+            Snapshot[] snaps = new Snapshot[]{snapshot,conflictSnapshot};
+            try {
+                int which = game.resolveConflict(snaps[0].getSnapshotContents().readFully(),
+                        snaps[1].getSnapshotContents().readFully());
+                mResolvedSnapshot=snaps[which];
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Snapshots.OpenSnapshotResult resolveResult = Games.Snapshots.resolveConflict(
+                    mGoogleApiClient, result.getConflictId(), mResolvedSnapshot).await();
+
+            if (retryCount < MAX_SNAPSHOT_RESOLVE_RETRIES) {
+                // Recursively attempt again
+                return processSnapshotOpenResult(game, resolveResult, retryCount);
+            } else {
+                // Failed, log error
+                String message = "Could not resolve snapshot conflicts";
+                Log.e(TAG, message);
+            }
+
+        }
+
+        // Fail, return null.
+        return null;
     }
 }
