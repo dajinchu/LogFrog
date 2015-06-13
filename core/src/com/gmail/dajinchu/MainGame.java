@@ -10,10 +10,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -27,7 +32,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private ShapeRenderer renderer;
     private ShapeRenderer debugRenderer;
     private Stage uistage;
-    private Table table;
+    private Table infotable;
 
     static float nodeRadius=4, logWidth=4;
     static int mapHeight, mapWidth;
@@ -38,10 +43,12 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
     public static AnalyticsHelper ah;
     public final SavedGameHelper sgh;
-    private TextButton sync;
+    private TextButton options;
     private GameView view;
     private ScreenViewport uiviewport;
     private Label levelinfo;
+    private TextButton mainmenu;
+    private Table optionmenu;
 
     public MainGame(ScreenManager sm, AnalyticsHelper ah, SavedGameHelper sgh) {
         this.ah=ah;
@@ -65,21 +72,75 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
         uiviewport = new ScreenViewport();
         uistage = new Stage();
-        table = new Table();
-        table.setFillParent(true);
-        table.top();
-        sync = new TextButton("Sync", sm.buttonStyle);
-        sync.addListener(new ChangeListener() {
+
+        //info table resides in a sort of upper bar above the gameplay, and has the options button
+        //and level/moves info
+        infotable = new Table();
+        infotable.setFillParent(true);
+        infotable.top();
+        options = new TextButton("Options", sm.buttonStyle);
+        options.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                sgh.load(MainGame.this);
+                optionmenu.setVisible(true);
+                final InputListener optionlistener = new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                        //Prevents events that are for the options menu from leaking to the game
+                        //listener or the tapping-away-from-menu-box listener
+                        event.stop();
+                        return true;
+                    }
+                };
+                optionmenu.addListener(optionlistener);
+                uistage.addListener(new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+                        //Closes the options menu and unregisters these two listeners when anything
+                        //is clicked, except if it is the menu box getting clicked, in which case
+                        //the event is stopped by the previous listener
+                        optionmenu.setVisible(false);
+                        uistage.removeListener(this);
+                        optionmenu.removeListener(optionlistener);
+                        return false;
+                    }
+                });
             }
         });
         levelinfo = new Label("Level "+level+"  Moves: 0",sm.labelStyle);
 
-        table.add(levelinfo).left().top().expandX();
-        table.add(sync).right().top().expandX();
-        uistage.addActor(table);
+        infotable.add(levelinfo).left().top().expandX();
+        infotable.add(options).right().top().expandX();
+        uistage.addActor(infotable);
+
+        //option table is the menu overlay that pops up after hitting the options button
+        optionmenu = new Table();
+        optionmenu.setFillParent(true);
+        optionmenu.center();
+        Stack optionstack = new Stack();
+        VerticalGroup options = new VerticalGroup();
+        Image optionbackground = new Image(sm.buttonStyle.up);
+        Label optiontitle = new Label("Options",sm.labelStyle);
+        mainmenu = new TextButton("Main Menu", sm.buttonStyle);
+        mainmenu.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                sm.setScreen(sm.menuScreen);
+            }
+        });
+        options.pad(20);
+        options.space(20);
+        options.addActor(optiontitle);
+        options.addActor(mainmenu);
+
+        optionstack.add(optionbackground);
+        optionstack.add(options);
+        optionmenu.add(optionstack);
+        optionmenu.setVisible(false);
+        optionmenu.setDebug(true);
+        uistage.addActor(optionmenu);
+
+
         view = new GameView(this);
 
         //Now that levelinfo is instantiated, it is safe to load level
@@ -112,13 +173,16 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         uiviewport.apply();
         uistage.act(Gdx.graphics.getDeltaTime());
         uistage.draw();
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        optionmenu.drawDebug(debugRenderer);
+        debugRenderer.end();
 
     }
 
     @Override
     public void resize(int w, int h){
         uiviewport.update(w, h, true);
-        viewport.update(w, (int) (h - sync.getHeight()), true);
+        viewport.update(w, (int) (h - options.getHeight()), true);
         uistage.setViewport(uiviewport);
         /*
         float translate =viewport.unproject(new Vector3(0,h-viewport.project(new Vector2(0,mapHeight)).y,0)).y;
