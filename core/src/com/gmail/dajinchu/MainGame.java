@@ -167,13 +167,10 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         optionstack.add(options);
         optionmenu.add(optionstack);
         optionmenu.setVisible(false);
-        optionmenu.setDebug(true);
         uistage.addActor(optionmenu);
 
         //This draws the actual gameplay
         view = new GameView(this);
-
-
 
         //Now that levelinfo is instantiated, it is safe to load level
         sgh.load(this);
@@ -205,9 +202,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         uiviewport.apply();
         uistage.act(Gdx.graphics.getDeltaTime());
         uistage.draw();
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        optionmenu.drawDebug(debugRenderer);
-        debugRenderer.end();
 
     }
 
