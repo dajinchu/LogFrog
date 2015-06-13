@@ -32,7 +32,10 @@ public class GameView {
             switch (l.state){
                 case CONNECTED:batch.setColor(Color.YELLOW);break;
                 case DISCONNECTED:batch.setColor(Color.WHITE);break;
-                case POTENTIAL:batch.setColor(Color.LIGHT_GRAY);break;
+                case POTENTIAL:
+                    if(!game.hints)continue;
+                    batch.setColor(Color.LIGHT_GRAY);
+                    break;
             }
             if(l.selected)batch.setColor(Color.MAROON);
 

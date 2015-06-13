@@ -9,10 +9,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * Created by Da-Jin on 5/31/2015.
@@ -25,6 +28,7 @@ public class ScreenManager extends Game {
     public BitmapFont font;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle buttonStyle;
+    public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
 
     public ScreenManager(MainMenu menuScreen){
@@ -56,6 +60,11 @@ public class ScreenManager extends Game {
         buttonStyle.fontColor=Color.WHITE;
         buttonStyle.up=buttonup;
         buttonStyle.down=buttondown;
+
+        TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(new Texture("checked.png")));
+        TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
+        checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked,checked,fontSmall,Color.WHITE);
+        checkBoxStyle.up=buttonup;
 
 
         setScreen(menuScreen);

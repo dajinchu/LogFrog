@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private final ScreenManager sm;
+    public boolean hints;
     SpriteBatch batch;
     Model model;
     private ShapeRenderer renderer;
@@ -55,7 +56,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         this.sgh=sgh;
         this.sm = sm;
         level = sm.prefs.getInteger("level",1);
-
+        hints = sm.prefs.getBoolean("hints",true);
     }
 
     @Override
@@ -121,8 +122,28 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         VerticalGroup options = new VerticalGroup();
         Image optionbackground = new Image(sm.buttonStyle.up);
         Label optiontitle = new Label("Options",sm.labelStyle);
+        final TextButton togglehints = new TextButton("",sm.buttonStyle);
         TextButton sync = new TextButton("Sync Play Games", sm.buttonStyle);
         TextButton mainmenu = new TextButton("Main Menu", sm.buttonStyle);
+
+        if(hints) {
+            togglehints.setText("Hints: On");
+        }else{
+            togglehints.setText("Hints: Off");
+        }
+        togglehints.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(hints){
+                    hints = false;
+                    togglehints.setText("Hints: Off");
+                }else{
+                    hints = true;
+                    togglehints.setText("Hints: On");
+                }
+                sm.prefs.putBoolean("hints", hints);
+            }
+        });
         sync.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -138,6 +159,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         options.pad(20);
         options.space(20);
         options.addActor(optiontitle);
+        options.addActor(togglehints);
         options.addActor(sync);
         options.addActor(mainmenu);
 
@@ -204,6 +226,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     @Override
     public boolean keyDown(int keycode) {
         if(keycode== Input.Keys.BACK){
+            sm.prefs.flush();
             sm.mainmenu();
         }
         return false;
