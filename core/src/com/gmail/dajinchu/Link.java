@@ -75,8 +75,6 @@ public class Link {
             bottom+=8/2;
         }
         rect = new Rectangle(left+4, bottom, width, height);
-
-
     }
 
     public Node getOther(Node node){

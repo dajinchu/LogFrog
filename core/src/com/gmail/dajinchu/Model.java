@@ -1,6 +1,7 @@
 package com.gmail.dajinchu;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.SnapshotArray;
@@ -63,11 +64,12 @@ public class Model {
         loadedMillis= TimeUtils.millis();
     }
 
-    public void selectLink(Link link){
+    public Link selectLink(Link link){
         for(LinkSpace ls:linknodes)nodegrid[ls.x][ls.y]=null;
         linknodes.clear();
 
         if(link.state== Link.STATE.POTENTIAL){
+            Link old = selected;
             //Place it
             links.removeValue(selected,true);
             selected=null;
@@ -76,21 +78,22 @@ public class Model {
 
             //Record for Analytics
             movesToComplete++;
-            return;
+            return old;
         }
         if(link.selected){
             //Deselect currently selected
             //Clicked on already selected
             clearSelection();
-            return;
+            return null;
         }
         //Pick it up
         //Must be a connected link to be selected aka picked up
-        if(link.state!= Link.STATE.CONNECTED)return;
+        if(link.state!= Link.STATE.CONNECTED)return null;
         //If there is already someone selected, get rid of it
         if(selected!=null)selected.selected=false;
         selected = link;
         link.selected = true;
+        return null;
     }
 
     public void updateHighlight(){

@@ -260,7 +260,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         for(int i = 0; i < clickedLinks.length; i++){
             //clickedLinks is sorted by priority, lowest index is used and we return since we're done
             if(clickedLinks[i]!=null){
-                model.selectLink(clickedLinks[i]);
+                view.animateLinks(model.selectLink(clickedLinks[i]),clickedLinks[i]);
                 model.updateHighlight();
                 if(model.nodes.get(model.nodes.size-1).on){
                     //Goal has been reached!
