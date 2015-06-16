@@ -79,7 +79,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
                 toggleSignIn();
             }
         });
-        startGame = new TextButton("Play", sm.buttonStyle);
+        startGame = new TextButton("Play", sm.buttonStyleLarge);
         startGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

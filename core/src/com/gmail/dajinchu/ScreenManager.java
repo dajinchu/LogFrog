@@ -27,7 +27,7 @@ public class ScreenManager extends Game {
 
     public BitmapFont font;
     public Label.LabelStyle labelStyle;
-    public TextButton.TextButtonStyle buttonStyle;
+    public TextButton.TextButtonStyle buttonStyle, buttonStyleLarge;
     public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
 
@@ -46,7 +46,8 @@ public class ScreenManager extends Game {
 
         SmartFontGenerator fontGenerator = new SmartFontGenerator();
         FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
-        BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth()*.05f));
+        BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
+        BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth()*.15f));
 
         NinePatchDrawable buttonup =new NinePatchDrawable(new NinePatch(new Texture("buttonup.png"),1,1,1,1));
         NinePatchDrawable buttondown =new NinePatchDrawable(new NinePatch(new Texture("buttondown.png"),1,1,1,1));
@@ -60,6 +61,9 @@ public class ScreenManager extends Game {
         buttonStyle.fontColor=Color.WHITE;
         buttonStyle.up=buttonup;
         buttonStyle.down=buttondown;
+
+        buttonStyleLarge = new TextButton.TextButtonStyle(buttonStyle);
+        buttonStyleLarge.font = fontLarge;
 
         TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(new Texture("checked.png")));
         TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
