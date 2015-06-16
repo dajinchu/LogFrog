@@ -18,8 +18,6 @@ public class GameView {
     private final Texture link, node;
     private final TextureRegion linkregion;
 
-    private static final float MOVE_LOG_ANIMATION_TIME = 100;
-
     private float animationProgress;
     Link movingLink;
     long beginMove;
@@ -38,7 +36,6 @@ public class GameView {
 
 
     public void draw(Batch batch){
-
         Model model = game.model;
         animationProgress= TimeUtils.millis()-beginMove;
         for(Link l:model.links){
@@ -53,8 +50,8 @@ public class GameView {
             if(l.selected)batch.setColor(Color.MAROON);
 
             l.rect.getCenter(tempCenter);
-            if(l==movingLink&&animationProgress<MOVE_LOG_ANIMATION_TIME){
-                float alpha = animationProgress/MOVE_LOG_ANIMATION_TIME;
+            if(l==movingLink&&animationProgress<MainGame.MOVE_LOG_ANIMATION_TIME){
+                float alpha = animationProgress/MainGame.MOVE_LOG_ANIMATION_TIME;
                 movingpos = oldpos.cpy().lerp(newpos, alpha);
                 batch.draw(linkregion,
                         movingpos.x,movingpos.y-l.distance*10,

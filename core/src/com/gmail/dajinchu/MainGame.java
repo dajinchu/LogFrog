@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -28,8 +29,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame implements InputProcessor, Screen, SavedGameListener{
     private final ScreenManager sm;
+
+    //prefs
     private final boolean signedin;
     public boolean hints;
+    public static float MOVE_LOG_ANIMATION_TIME;//milliseconds
+
     SpriteBatch batch;
     Model model;
     private ShapeRenderer renderer;
@@ -59,6 +64,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         level = sm.prefs.getInteger("level",1);
         hints = sm.prefs.getBoolean("hints", true);
         signedin = sm.prefs.getBoolean("gpgs", false);
+        MOVE_LOG_ANIMATION_TIME = sm.prefs.getInteger("link_animation", 100);
     }
 
     @Override
@@ -82,9 +88,10 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         infotable.setFillParent(true);
         infotable.top();
         options = new TextButton("Options", sm.buttonStyle);
-        options.addListener(new ChangeListener() {
+        options.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(!optionmenu.isVisible())event.stop();
                 optionmenu.setVisible(true);
 
                 final InputListener optionlistener = new InputListener(){
@@ -109,6 +116,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
                         return false;
                     }
                 });
+                return false;
             }
         });
         levelinfo = new Label("Level "+level+"  Moves: 0",sm.labelStyle);
