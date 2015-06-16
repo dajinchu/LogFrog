@@ -17,15 +17,17 @@ public class GameView {
     private final MainGame game;
     private final Texture link, node;
     private final TextureRegion linkregion;
-    private Vector2 center = new Vector2();
 
     private static final float MOVE_LOG_ANIMATION_TIME = 100;
 
     private float animationProgress;
     Link movingLink;
     long beginMove;
-    int rotate1, rotate2;
+    private Vector2 newCenter = new Vector2(), oldCenter = new Vector2();
+    int newRotate, oldRotate;
     Vector2 oldpos, newpos;
+    private Vector2 movingpos;
+    private Vector2 tempCenter = new Vector2();
 
     public GameView(MainGame game){
         this.game = game;
@@ -50,14 +52,20 @@ public class GameView {
             }
             if(l.selected)batch.setColor(Color.MAROON);
 
-            l.rect.getCenter(center);
+            l.rect.getCenter(tempCenter);
             if(l==movingLink&&animationProgress<MOVE_LOG_ANIMATION_TIME){
                 float alpha = animationProgress/MOVE_LOG_ANIMATION_TIME;
-                batch.draw(linkregion, MainGame.logWidth, l.distance*20, new Affine2().translate(oldpos.cpy().lerp(newpos,alpha)).rotate(MathUtils.lerp(rotate2,rotate1,alpha)));
+                movingpos = oldpos.cpy().lerp(newpos, alpha);
+                batch.draw(linkregion,
+                        movingpos.x,movingpos.y-l.distance*10,
+                        MainGame.logWidth/2, l.distance*20/2,
+                        MainGame.logWidth, l.distance*20,
+                        1,1,
+                        MathUtils.lerp(oldRotate, newRotate,alpha));
             }else if(l.horizontal) {
-                batch.draw(linkregion, MainGame.logWidth, l.distance * 20, new Affine2().translate(l.rect.x, center.y + MainGame.logWidth / 2).rotate(-90));
+                batch.draw(linkregion, MainGame.logWidth, l.distance * 20, new Affine2().translate(l.rect.x, tempCenter.y + MainGame.logWidth / 2).rotate(-90));
             }else {
-                batch.draw(linkregion, MainGame.logWidth, l.distance*20, new Affine2().translate(center.x - MainGame.logWidth / 2, l.rect.y));
+                batch.draw(linkregion, MainGame.logWidth, l.distance*20, new Affine2().translate(tempCenter.x - MainGame.logWidth / 2, l.rect.y));
             }
         }
         for(Node n:model.nodes.values()){
@@ -76,20 +84,30 @@ public class GameView {
         movingLink = newLink;
         beginMove = TimeUtils.millis();
 
-        Vector2 center = new Vector2();
-        rotate1=0;
-        rotate2=0;
-        newLink.rect.getCenter(center);
-        newpos = new Vector2(center.x - MainGame.logWidth / 2, newLink.rect.y);
-        if(newLink.horizontal){
-            rotate1 = -90;
-            newpos.set(newLink.rect.x, center.y + MainGame.logWidth / 2);
+
+        newLink.rect.getCenter(newCenter);
+        oldLink.rect.getCenter(oldCenter);
+
+        Vector2 delta = newCenter.cpy().sub(oldCenter);
+        //Slope is 1 or negative 1
+        float slope;
+        if(delta.x==0||delta.y==0){
+            slope = 1;
+        }else {
+            slope = delta.y / delta.x;
+            slope /= Math.abs(slope);
         }
-        oldLink.rect.getCenter(center);
-        oldpos = new Vector2(center.x - MainGame.logWidth / 2, oldLink.rect.y);
+
+        newRotate =0;
+        oldRotate =0;
+
+        newpos=newCenter.cpy();
+        if(newLink.horizontal){
+            newRotate = (int) (90*slope);
+        }
+        oldpos=oldCenter.cpy();
         if(oldLink.horizontal){
-            rotate2 = -90;
-            oldpos.set(oldLink.rect.x, center.y + MainGame.logWidth / 2);
+            oldRotate = (int) (90*slope);
         }
     }
 }
