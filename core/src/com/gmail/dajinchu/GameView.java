@@ -55,11 +55,11 @@ public class GameView {
                 float alpha = animationProgress/MOVE_LOG_ANIMATION_TIME;
                 movingpos = oldpos.cpy().lerp(newpos, alpha);
                 batch.draw(linkregion,
-                        movingpos.x,movingpos.y-l.distance*10,
+                        movingpos.x-MainGame.logWidth/2,movingpos.y-l.distance*10,
                         MainGame.logWidth/2, l.distance*20/2,
                         MainGame.logWidth, l.distance*20,
                         1,1,
-                        MathUtils.lerp(oldRotate, newRotate,alpha));
+                        MathUtils.lerp(oldRotate, newRotate, alpha));
             }else if(l.horizontal) {
                 batch.draw(linkregion, MainGame.logWidth, l.distance * 20, new Affine2().translate(l.rect.x, tempCenter.y + MainGame.logWidth / 2).rotate(-90));
             }else {
