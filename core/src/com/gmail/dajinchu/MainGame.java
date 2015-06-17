@@ -32,8 +32,8 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
     //prefs
     private final boolean signedin;
-    public boolean hints;
-    public static float MOVE_LOG_ANIMATION_TIME;//milliseconds
+    public boolean hints, linkAnimation;
+
 
     SpriteBatch batch;
     Model model;
@@ -64,7 +64,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         level = sm.prefs.getInteger("level",1);
         hints = sm.prefs.getBoolean("hints", true);
         signedin = sm.prefs.getBoolean("gpgs", false);
-        MOVE_LOG_ANIMATION_TIME = sm.prefs.getInteger("link_animation", 100);
+        linkAnimation = sm.prefs.getBoolean("link_animation", true);
     }
 
     @Override
@@ -134,25 +134,34 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         Image optionbackground = new Image(sm.buttonStyle.up);
         Label optiontitle = new Label("Options",sm.labelStyle);
         final TextButton togglehints = new TextButton("",sm.buttonStyle);
+        final TextButton toggleanimation = new TextButton("",sm.buttonStyle);
         TextButton sync = new TextButton("Sync Play Games", sm.buttonStyle);
         TextButton mainmenu = new TextButton("Main Menu", sm.buttonStyle);
 
-        if(hints) {
-            togglehints.setText("Hints: On");
-        }else{
-            togglehints.setText("Hints: Off");
-        }
+        updatePrefText(togglehints, "Hints", hints);
         togglehints.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if(hints){
                     hints = false;
-                    togglehints.setText("Hints: Off");
                 }else{
                     hints = true;
-                    togglehints.setText("Hints: On");
                 }
+                updatePrefText(togglehints, "Hints", hints);
                 sm.prefs.putBoolean("hints", hints);
+            }
+        });
+        updatePrefText(toggleanimation, "Animations", linkAnimation);
+        toggleanimation.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if(linkAnimation){
+                    linkAnimation = false;
+                }else{
+                    linkAnimation = true;
+                }
+                updatePrefText(toggleanimation, "Animations", linkAnimation);
+                sm.prefs.putBoolean("link_animation", linkAnimation);
             }
         });
         sync.addListener(new ChangeListener() {
@@ -171,6 +180,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         options.space(20);
         options.addActor(optiontitle);
         options.addActor(togglehints);
+        options.addActor(toggleanimation);
         if(signedin)options.addActor(sync);
         options.addActor(mainmenu);
 
@@ -228,6 +238,14 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         viewport.getCamera().update();*/
     }
 
+    private void updatePrefText(TextButton toggle, String display, boolean preference){
+        if(preference) {
+            toggle.setText(display+": On");
+        }else{
+            toggle.setText(display+": Off");
+        }
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         if(keycode== Input.Keys.BACK){
@@ -268,7 +286,10 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         for(int i = 0; i < clickedLinks.length; i++){
             //clickedLinks is sorted by priority, lowest index is used and we return since we're done
             if(clickedLinks[i]!=null){
-                view.animateLinks(model.selectLink(clickedLinks[i]),clickedLinks[i]);
+                Link oldLink = model.selectLink(clickedLinks[i]);
+                if(linkAnimation) {
+                    view.animateLinks(oldLink,clickedLinks[i]);
+                }
                 model.updateHighlight();
                 if(model.nodes.get(model.nodes.size-1).on){
                     //Goal has been reached!

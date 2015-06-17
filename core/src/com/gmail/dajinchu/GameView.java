@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.TimeUtils;
  * Created by Da-Jin on 6/2/2015.
  */
 public class GameView {
+    public static float MOVE_LOG_ANIMATION_TIME = 100;//milliseconds
 
     private final MainGame game;
     private final Texture link, node;
@@ -50,8 +51,8 @@ public class GameView {
             if(l.selected)batch.setColor(Color.MAROON);
 
             l.rect.getCenter(tempCenter);
-            if(l==movingLink&&animationProgress<MainGame.MOVE_LOG_ANIMATION_TIME){
-                float alpha = animationProgress/MainGame.MOVE_LOG_ANIMATION_TIME;
+            if(l==movingLink&&animationProgress<MOVE_LOG_ANIMATION_TIME){
+                float alpha = animationProgress/MOVE_LOG_ANIMATION_TIME;
                 movingpos = oldpos.cpy().lerp(newpos, alpha);
                 batch.draw(linkregion,
                         movingpos.x,movingpos.y-l.distance*10,
