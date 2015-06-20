@@ -93,7 +93,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         });
         GPGS.setVisible(false);
 
-        table.add(GPGS).expand().top().right();
+        table.add(GPGS).expand().top().right().padTop(20).padRight(20);
         table.row();
         table.add(startGame).expandY().top();
 

@@ -38,7 +38,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     SpriteBatch batch;
     Model model;
     private ShapeRenderer renderer;
-    private ShapeRenderer debugRenderer;
     private Stage uistage;
     private Table infotable;
 
@@ -71,7 +70,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 	public void show () {
 		batch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        debugRenderer = new ShapeRenderer();
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -121,6 +119,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         });
         levelinfo = new Label("Level "+level+"  Moves: 0",sm.labelStyle);
 
+        infotable.pad(10);
         infotable.add(levelinfo).left().top().expandX();
         infotable.add(options).right().top().expandX();
         uistage.addActor(infotable);
@@ -209,7 +208,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
         renderer.setProjectionMatrix(viewport.getCamera().combined);
         batch.setProjectionMatrix(viewport.getCamera().combined);
-        debugRenderer.setProjectionMatrix(viewport.getCamera().combined);
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(model==null){
@@ -229,7 +227,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     @Override
     public void resize(int w, int h){
         uiviewport.update(w, h, true);
-        viewport.update(w, (int) (h - options.getHeight()), true);
+        viewport.update(w, (int) (h - options.getHeight()-infotable.getPadBottom()-infotable.getPadTop()), true);
         uistage.setViewport(uiviewport);
         /*
         float translate =viewport.unproject(new Vector3(0,h-viewport.project(new Vector2(0,mapHeight)).y,0)).y;
