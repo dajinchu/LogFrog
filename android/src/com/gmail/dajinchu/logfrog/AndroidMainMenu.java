@@ -53,6 +53,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClearColor(1,1,1,1);
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }
