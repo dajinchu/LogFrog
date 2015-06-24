@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.TimeUtils;
  * Created by Da-Jin on 6/2/2015.
  */
 public class GameView {
-    public static float MOVE_LOG_ANIMATION_TIME = 100;//milliseconds
+    public static float MOVE_LOG_ANIMATION_TIME = 1000;//milliseconds
 
     private final MainGame game;
     private final Texture link, node;
@@ -36,7 +36,7 @@ public class GameView {
     public GameView(MainGame game){
         this.game = game;
         link = new Texture("white.png");
-        node = new Texture("ship2.png");
+        node = new Texture("aa-node.png");
         shadow = new Texture("buttonuplight.png");
         linkregion = new TextureRegion(link);
     }
@@ -46,19 +46,20 @@ public class GameView {
         Model model = game.model;
         animationProgress= TimeUtils.millis()-beginMove;
 
-        for(Link l:model.links){
-            if(l==movingLink){
-                if(animationProgress<=MOVE_LOG_ANIMATION_TIME) {
-                    float alpha = animationProgress / MOVE_LOG_ANIMATION_TIME;
-                    l.center = oldpos.cpy().lerp(newpos, alpha);
-                    l.rotation = MathUtils.lerp(oldRotate, newRotate, alpha);
-                    continue;
-                }else{
-                    l.center = newpos;
-                    l.rotation = Math.abs(newRotate);
-                    movingLink = null;
-                }
+        //if we're animating, step forward animation
+        if(movingLink != null){
+            if(animationProgress<=MOVE_LOG_ANIMATION_TIME) {
+                float alpha = animationProgress / MOVE_LOG_ANIMATION_TIME;
+                movingLink.center = oldpos.cpy().lerp(newpos, alpha);
+                movingLink.rotation = MathUtils.lerp(oldRotate, newRotate, alpha);
+            }else{
+                movingLink.center = newpos;
+                movingLink.rotation = Math.abs(newRotate);
+                movingLink = null;
             }
+        }
+        for(Link l:model.links){
+
             if(l.selected){
                 //We draw selected later after everything else so that it appears on top.
                 continue;
@@ -71,6 +72,7 @@ public class GameView {
                     batch.setColor(Color.LIGHT_GRAY);
                     break;
             }
+            if(l==movingLink)batch.setColor(selected);
             drawLink(batch,l);
         }
         for(Node n:model.nodes.values()){
@@ -98,7 +100,10 @@ public class GameView {
     }
 
     public void animateLinks(Link oldLink, Link newLink){
-        if(oldLink==null||newLink==null)return;
+        if(oldLink==null||newLink==null){
+            Gdx.app.log("GameView","links null");
+            return;
+        }
         movingLink = newLink;
         beginMove = TimeUtils.millis();
 
@@ -120,5 +125,9 @@ public class GameView {
         newRotate=newLink.rotation*slope;
         oldRotate=oldLink.rotation*slope;
         Gdx.app.log("GameView","slope "+slope+"  "+ oldRotate+"->"+newRotate);
+
+        if(movingLink.selected){
+            Gdx.app.log("GameView", "moving link is selected!");
+        }
     }
 }

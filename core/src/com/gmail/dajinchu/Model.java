@@ -73,11 +73,10 @@ public class Model {
         if(link.state== Link.STATE.POTENTIAL){
             Link old = selected;
             //Place it
-            links.removeValue(selected,true);
-            selected=link;
-            selected.pickup();
-            link.state= Link.STATE.DISCONNECTED;
             playerNode=link.n1.id;
+            links.removeValue(selected,true);
+            clearSelection();
+            link.state= Link.STATE.DISCONNECTED;
 
             //Record for Analytics
             movesToComplete++;

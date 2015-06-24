@@ -23,6 +23,7 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode=true;
+        config.numSamples=2;
         mainmenu = new AndroidMainMenu(this);
         ScreenManager sm = new ScreenManager(mainmenu);
         initialize(sm, config);
