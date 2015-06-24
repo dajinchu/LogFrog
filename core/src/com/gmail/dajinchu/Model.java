@@ -1,5 +1,6 @@
 package com.gmail.dajinchu;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
@@ -64,6 +65,8 @@ public class Model {
     }
 
     public Link selectLink(Link link){
+
+        Gdx.app.log("Model",link.toString());
         for(LinkSpace ls:linknodes)nodegrid[ls.x][ls.y]=null;
         linknodes.clear();
 
@@ -71,7 +74,8 @@ public class Model {
             Link old = selected;
             //Place it
             links.removeValue(selected,true);
-            selected=null;
+            selected=link;
+            selected.pickup();
             link.state= Link.STATE.DISCONNECTED;
             playerNode=link.n1.id;
 
@@ -89,9 +93,10 @@ public class Model {
         //Must be a connected link to be selected aka picked up
         if(link.state!= Link.STATE.CONNECTED)return null;
         //If there is already someone selected, get rid of it
-        if(selected!=null)selected.selected=false;
+        if(selected!=null)clearSelection();
         selected = link;
         link.selected = true;
+        link.pickup();
         return null;
     }
 
@@ -123,6 +128,7 @@ public class Model {
 
     public void clearSelection(){
         if(selected==null)return;
+        selected.drop();
         selected.selected=false;
         selected=null;
         return;

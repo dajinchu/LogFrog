@@ -2,6 +2,7 @@ package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Created by Da-Jin on 5/23/2015.
@@ -16,7 +17,9 @@ public class Link {
     enum STATE{CONNECTED,POTENTIAL,DISCONNECTED};
     STATE state=STATE.DISCONNECTED;
 
-    Rectangle rect;
+    Rectangle hitBox;
+    Vector2 center=new Vector2();
+    float rotation;
 
     private static final int WIDTH= 10;
 
@@ -59,12 +62,13 @@ public class Link {
             bottom=n2.y;
         }
         if(horizontal){
-            //Horizontal, so the "width" of rect is the long side
+            //Horizontal, so the "width" of hitBox is the long side
             width=Math.abs(n1.x-n2.x)*20;
             height=WIDTH;
             left*=20;
             bottom*=20;
             bottom+=(8-WIDTH)/2;
+            rotation = 90;
 
         }else{
             height=Math.abs(n1.y-n2.y)*20;
@@ -73,8 +77,17 @@ public class Link {
             bottom*=20;
             left-=WIDTH/2;
             bottom+=8/2;
+            rotation = 0;
         }
-        rect = new Rectangle(left+4, bottom, width, height);
+        hitBox = new Rectangle(left+4, bottom, width, height);
+        hitBox.getCenter(center);
+    }
+
+    public void pickup(){
+        rotation+=3;
+    }
+    public void drop(){
+        rotation-=3;
     }
 
     public Node getOther(Node node){

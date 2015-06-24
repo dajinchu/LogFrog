@@ -270,7 +270,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
         //lower the clickedLinks[x] number, the higher priority
         for(Link l : model.links){
-            if(l.rect.overlaps(clickBox)){
+            if(l.hitBox.overlaps(clickBox)){
                 Gdx.app.log("Clicked", "y");
                 if(l.state== Link.STATE.POTENTIAL){
                     clickedLinks[0]=l;
