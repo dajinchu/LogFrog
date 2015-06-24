@@ -55,7 +55,11 @@ public class GameView {
             }else{
                 movingLink.center = newpos;
                 movingLink.rotation = Math.abs(newRotate);
-                movingLink = null;
+                model.links.add(movingLink);
+                movingLink=null;
+                model.selected.selected=false;
+                model.selected=null;
+                model.updateHighlight();
             }
         }
         for(Link l:model.links){
@@ -72,7 +76,6 @@ public class GameView {
                     batch.setColor(Color.LIGHT_GRAY);
                     break;
             }
-            if(l==movingLink)batch.setColor(selected);
             drawLink(batch,l);
         }
         for(Node n:model.nodes.values()){
@@ -104,6 +107,7 @@ public class GameView {
             Gdx.app.log("GameView","links null");
             return;
         }
+
         movingLink = newLink;
         beginMove = TimeUtils.millis();
 

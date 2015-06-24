@@ -75,8 +75,18 @@ public class Model {
             //Place it
             playerNode=link.n1.id;
             links.removeValue(selected,true);
-            clearSelection();
+
+            selected.selected=false;
             link.state= Link.STATE.DISCONNECTED;
+            if(MainGame.linkAnimation) {
+                selected = link;
+                links.removeValue(link, true);
+                link.selected=true;
+                resetHighlight();
+            }else{
+                selected = null;
+                updateHighlight();
+            }
 
             //Record for Analytics
             movesToComplete++;
@@ -86,6 +96,7 @@ public class Model {
             //Deselect currently selected
             //Clicked on already selected
             clearSelection();
+            updateHighlight();
             return null;
         }
         //Pick it up
@@ -96,20 +107,11 @@ public class Model {
         selected = link;
         link.selected = true;
         link.pickup();
+        updateHighlight();
         return null;
     }
 
-    public void updateHighlight(){
-        //Prevent overlap/intersection
-        for(Link link:links){
-            //Ignore potential links, and if it's selected, it'll get moved out of the way when replaced
-            if(link.state== Link.STATE.POTENTIAL||link.selected)continue;
-            int deltax = (link.n1.x-link.n2.x)/link.distance;
-            int deltay = (link.n1.y-link.n2.y)/link.distance;
-            for(int i = 1; i < link.distance; i++){
-                new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i, this);
-            }
-        }
+    public void resetHighlight(){
         Object[] l = links.begin();
         for(int i = 0, n = links.size; i < n; i++){
             if(((Link)l[i]).state == Link.STATE.POTENTIAL){
@@ -122,6 +124,19 @@ public class Model {
             node.on=false;
         }
         links.end();
+    }
+    public void updateHighlight(){
+        //Prevent overlap/intersection
+        for(Link link:links){
+            //Ignore potential links, and if it's selected, it'll get moved out of the way when replaced
+            if(link.state== Link.STATE.POTENTIAL||link.selected)continue;
+            int deltax = (link.n1.x-link.n2.x)/link.distance;
+            int deltay = (link.n1.y-link.n2.y)/link.distance;
+            for(int i = 1; i < link.distance; i++){
+                new LinkSpace(link.n1.x-deltax*i,link.n1.y-deltay*i, this);
+            }
+        }
+        resetHighlight();
         nodes.get(playerNode).traverseNode(selected);
     }
 

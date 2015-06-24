@@ -32,7 +32,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
 
     //prefs
     private final boolean signedin;
-    public boolean hints, linkAnimation;
+    public static boolean hints, linkAnimation;
 
 
     SpriteBatch batch;
@@ -288,7 +288,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
                 if(linkAnimation) {
                     view.animateLinks(oldLink,clickedLinks[i]);
                 }
-                model.updateHighlight();
                 if(model.nodes.get(model.nodes.size-1).on){
                     //Goal has been reached!
                     nextLevel();
