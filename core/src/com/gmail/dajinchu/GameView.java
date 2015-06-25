@@ -13,11 +13,11 @@ import com.badlogic.gdx.utils.TimeUtils;
  * Created by Da-Jin on 6/2/2015.
  */
 public class GameView {
-    public static float MOVE_LOG_ANIMATION_TIME = 1000;//milliseconds
+    public static float MOVE_LOG_ANIMATION_TIME = 150;//milliseconds
 
     private final MainGame game;
     private final Texture link, node;
-    private final TextureRegion linkregion;
+    private final TextureRegion linkregion, shadowregion;
     private final Texture shadow;
 
     private float animationProgress;
@@ -37,8 +37,9 @@ public class GameView {
         this.game = game;
         link = new Texture("white.png");
         node = new Texture("aa-node.png");
-        shadow = new Texture("buttonuplight.png");
+        shadow = new Texture("shadow1.png");
         linkregion = new TextureRegion(link);
+        shadowregion = new TextureRegion(shadow);
     }
 
 
@@ -54,11 +55,10 @@ public class GameView {
                 movingLink.rotation = MathUtils.lerp(oldRotate, newRotate, alpha);
             }else{
                 movingLink.center = newpos;
-                movingLink.rotation = Math.abs(newRotate);
+                movingLink.rotation = newRotate;
                 model.links.add(movingLink);
                 movingLink=null;
-                model.selected.selected=false;
-                model.selected=null;
+                model.clearSelection();
                 model.updateHighlight();
             }
         }
@@ -88,6 +88,8 @@ public class GameView {
             batch.draw(node, n.x * 20, n.y * 20, MainGame.nodeRadius * 2, MainGame.nodeRadius * 2);
         }
         if(model.selected!=null) {
+            batch.setColor(Color.BLACK);
+            drawShadow(batch, model.selected);
             batch.setColor(selected);
             drawLink(batch, model.selected);
         }
@@ -98,6 +100,16 @@ public class GameView {
                 l.center.x-MainGame.logWidth/2,l.center.y-l.distance*10,
                 MainGame.logWidth/2, l.distance*20/2,
                 MainGame.logWidth, l.distance*20,
+                1,1,
+                l.rotation);
+    }
+
+    public void drawShadow(Batch batch, Link l){
+        batch.enableBlending();
+        batch.draw(shadowregion,
+                l.center.x-(MainGame.logWidth+2f)/2,l.center.y-l.distance*20f/2-1f,
+                (MainGame.logWidth+2f)/2, (l.distance*20f+2f)/2,
+                MainGame.logWidth+2, l.distance*20+2,
                 1,1,
                 l.rotation);
     }
@@ -126,8 +138,12 @@ public class GameView {
 
         newpos=newLink.center.cpy();
         oldpos=oldLink.center.cpy();
-        newRotate=newLink.rotation*slope;
         oldRotate=oldLink.rotation*slope;
+        if(Math.abs(oldLink.rotation)==Math.abs(newLink.rotation)){
+            newRotate=oldRotate;
+        } else {
+            newRotate = newLink.rotation * slope;
+        }
         Gdx.app.log("GameView","slope "+slope+"  "+ oldRotate+"->"+newRotate);
 
         if(movingLink.selected){

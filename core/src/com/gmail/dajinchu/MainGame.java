@@ -221,7 +221,6 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         uiviewport.apply();
         uistage.act(Gdx.graphics.getDeltaTime());
         uistage.draw();
-
     }
 
     @Override

@@ -84,10 +84,10 @@ public class Link {
     }
 
     public void pickup(){
-        rotation+=3;
+
     }
     public void drop(){
-        rotation-=3;
+
     }
 
     public Node getOther(Node node){
