@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -43,7 +44,7 @@ public class GameView {
     }
 
 
-    public void draw(Batch batch){
+    public void draw(Batch batch, ShapeRenderer shapeRenderer){
         Model model = game.model;
         animationProgress= TimeUtils.millis()-beginMove;
 
@@ -74,8 +75,13 @@ public class GameView {
                 case DISCONNECTED:batch.setColor(disconnected);break;
                 case POTENTIAL:
                     if(!game.hints)continue;
-                    batch.setColor(Color.LIGHT_GRAY);
-                    break;
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(selected);
+                    shapeRenderer.rectLine(l.n1.x*20+MainGame.nodeRadius,l.n1.y*20+MainGame.nodeRadius,
+                            l.n2.x*20+MainGame.nodeRadius,l.n2.y*20+MainGame.nodeRadius,
+                            MainGame.logWidth);
+                    shapeRenderer.end();
+                    continue;
             }
             drawLink(batch,l);
         }
@@ -86,7 +92,9 @@ public class GameView {
                 batch.setColor(disconnected);
             }
             if(n.id==model.nodes.size-1)batch.setColor(nodeGoal);
+            batch.begin();
             batch.draw(node, n.x * 20, n.y * 20, MainGame.nodeRadius * 2, MainGame.nodeRadius * 2);
+            batch.end();
         }
         if(model.selected!=null) {
             batch.setColor(Color.BLACK);
@@ -97,15 +105,18 @@ public class GameView {
     }
 
     public void drawLink(Batch batch, Link l){
+        batch.begin();
         batch.draw(linkregion,
                 l.center.x-MainGame.logWidth/2,l.center.y-l.distance*10,
                 MainGame.logWidth/2, l.distance*20/2,
                 MainGame.logWidth, l.distance*20,
                 1,1,
                 l.rotation);
+        batch.end();
     }
 
     public void drawShadow(Batch batch, Link l){
+        batch.begin();
         batch.enableBlending();
         batch.draw(shadowregion,
                 l.center.x-(MainGame.logWidth+2f)/2,l.center.y-l.distance*20f/2-1f,
@@ -113,6 +124,7 @@ public class GameView {
                 MainGame.logWidth+2, l.distance*20+2,
                 1,1,
                 l.rotation);
+        batch.end();
     }
 
     public void animateLinks(Link oldLink, Link newLink){

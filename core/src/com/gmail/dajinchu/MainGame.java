@@ -213,9 +213,7 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         if(model==null){
             return;
         }
-        batch.begin();
-        view.draw(batch);
-        batch.end();
+        view.draw(batch, renderer);
 
         //.apply changes the "active" viewport. SO IMPORTANT, and NOT ON DOCUMENTATION
         uiviewport.apply();
