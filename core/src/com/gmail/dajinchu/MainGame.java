@@ -284,14 +284,11 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
             //clickedLinks is sorted by priority, lowest index is used and we return since we're done
             if(clickedLinks[i]!=null){
                 Link oldLink = model.selectLink(clickedLinks[i]);
+                if(model.isLevelBeaten())nextLevel();
                 if(linkAnimation) {
-                    view.animateLinks(oldLink,clickedLinks[i]);
+                    view.animateLinks(oldLink, clickedLinks[i]);
                 }
-                if(model.nodes.get(model.nodes.size-1).on){
-                    //Goal has been reached!
-                    nextLevel();
-                }
-                levelinfo.setText("Level "+level+"  Moves: "+model.movesToComplete);
+                levelinfo.setText("Level " + level + "  Moves: " + model.movesToComplete);
                 return true;
             }
         }
@@ -310,6 +307,10 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
                 "Moves to finish a level", "Level "+level, model.movesToComplete);
 
         level++;
+        if(level == 41){
+            sm.setScreen(new End(sm,this));
+            return;
+        }
         loadLevel();
 
         sgh.write(new byte[]{(byte) level});
@@ -360,6 +361,12 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
     @Override
     public void hide() {
 
+    }
+
+    public void forceLevel(int level){
+        this.level = level;
+        sgh.write(new byte[]{(byte) level});
+        loadLevel();
     }
 
     @Override

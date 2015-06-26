@@ -60,6 +60,7 @@ public class GameView {
                 movingLink=null;
                 model.clearSelection();
                 model.updateHighlight();
+                if(model.isLevelBeaten())game.nextLevel();
             }
         }
         for(Link l:model.links){

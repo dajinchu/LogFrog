@@ -140,6 +140,14 @@ public class Model {
         nodes.get(playerNode).traverseNode(selected);
     }
 
+    public boolean isLevelBeaten(){
+        if(nodes.get(nodes.size-1).on){
+            //Goal has been reached!
+            return true;
+        }
+        return false;
+    }
+
     public void clearSelection(){
         if(selected==null)return;
         selected.drop();
