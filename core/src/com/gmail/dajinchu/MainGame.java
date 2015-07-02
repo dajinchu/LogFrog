@@ -192,14 +192,14 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
         //This draws the actual gameplay
         view = new GameView(this);
 
-        //Now that levelinfo is instantiated, it is safe to load level
-        sgh.load(this);
-        loadLevel();
-
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uistage);
         multiplexer.addProcessor(this);
         Gdx.input.setInputProcessor(multiplexer);
+
+        //Now that levelinfo is instantiated, it is safe to load level
+        sgh.load(this);
+        loadLevel();
 	}
 
     @Override
@@ -305,17 +305,17 @@ public class MainGame implements InputProcessor, Screen, SavedGameListener{
                 "Moves to finish a level", "Level "+level, model.movesToComplete);
 
         level++;
-        if(level == 41){
-            sm.setScreen(new End(sm,this));
-            return;
-        }
-        loadLevel();
-
         sgh.write(new byte[]{(byte) level});
         sm.prefs.putInteger("level", level);
+        loadLevel();
+
     }
 
     private void loadLevel(){
+        if(level == 41) {
+            sm.setScreen(new End(sm, this));
+            return;
+        }
         model = new Model(Gdx.files.internal("level"+level+".txt"));
         levelinfo.setText("Level "+level+"  Moves: 0");
     }
