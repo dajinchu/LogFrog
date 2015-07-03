@@ -2,6 +2,7 @@ package com.gmail.dajinchu;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -11,11 +12,14 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Created by Da-Jin on 5/31/2015.
@@ -25,11 +29,15 @@ public class ScreenManager extends Game {
     public SpriteBatch batch;
     public ShapeRenderer renderer;
 
+    public Stage uistage;
+    public Viewport uiviewport;
+
     public BitmapFont font;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle buttonStyle, buttonStyleLarge;
     public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
+    public InputMultiplexer multiplexer;
 
     public ScreenManager(MainMenu menuScreen){
         this.menuScreen = menuScreen;
@@ -70,8 +78,14 @@ public class ScreenManager extends Game {
         checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked,checked,fontSmall,Color.WHITE);
         checkBoxStyle.up=buttonup;
 
+        uiviewport = new ScreenViewport();
+        uistage = new Stage(uiviewport);
 
-        setScreen(menuScreen);
+        multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uistage);
+        Gdx.input.setInputProcessor(multiplexer);
+
+        mainmenu();
     }
 
     public void mainmenu(){
@@ -94,6 +108,13 @@ public class ScreenManager extends Game {
         font.dispose();
         batch.dispose();
         renderer.dispose();
+    }
+
+    @Override
+    public void resize(int w,int h){
+        super.resize(w,h);
+        uiviewport.update(w,h);
+        uistage.setViewport(uiviewport);
     }
 }
 

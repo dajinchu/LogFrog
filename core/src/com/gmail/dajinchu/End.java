@@ -40,8 +40,8 @@ public class End implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        stage = sm.uistage;
+        stage.clear();
         table = new Table();
         table.setFillParent(true);
         Label nomore = new Label("There's no more levels.", sm.labelStyle);
