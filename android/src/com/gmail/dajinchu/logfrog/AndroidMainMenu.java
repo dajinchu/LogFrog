@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.MainMenu;
 import com.gmail.dajinchu.ScreenManager;
+import com.gmail.dajinchu.Tutorial;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
@@ -42,7 +43,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private static int RC_SIGN_IN = 9001;
     private ScreenManager sm;
     private TextButton startGame;
-    private MainGame maingame;
     private ImageTextButton GPGS;
 
 
@@ -60,13 +60,24 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+
     }
 
     @Override
     public void show() {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+            .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+            .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
+            .build();
+        if(!sm.prefs.contains("level")){
+            sm.setScreen(new Tutorial(sm,new AndroidAnalyticsHelper(context),new AndroidSavedGameHelper(mGoogleApiClient)));
+        }
+
+        stage = sm.uistage;
+        stage.clear();
         table = new Table();
         table.setFillParent(true);
         table.pad(10);
@@ -85,29 +96,36 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 AndroidMainMenu.this.dispose();
-                maingame = new MainGame(sm,
+                MainGame maingame = new MainGame(sm,
                         new AndroidAnalyticsHelper(context),
                         new AndroidSavedGameHelper(mGoogleApiClient));
                 sm.prefs.flush();
                 sm.setScreen(maingame);
             }
         });
+        TextButton tutorial = new TextButton("Tutorial", sm.buttonStyle);
+        tutorial.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                AndroidMainMenu.this.dispose();
+                Tutorial tut = new Tutorial(sm,
+                        new AndroidAnalyticsHelper(context),
+                        new AndroidSavedGameHelper(mGoogleApiClient));
+                sm.prefs.flush();
+                sm.setScreen(tut);
+            }
+        });
         GPGS.setVisible(false);
 
         table.add(GPGS).expand().top().right().padTop(20).padRight(20);
         table.row();
-        table.add(startGame).expandY().top();
+        table.add(startGame).top();
+        table.row();
+        table.add(tutorial).expandY().top().pad(20);
 
         stage.addActor(table);
 
         Gdx.app.log("MainMenu","show");
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
-                .build();
         onStart();
     }
 
@@ -141,7 +159,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void hide() {
-
     }
 
     @Override
@@ -194,7 +211,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void dispose() {
-        stage.dispose();
     }
 
     @Override

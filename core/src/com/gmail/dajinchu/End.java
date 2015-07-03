@@ -40,12 +40,13 @@ public class End implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        stage = sm.uistage;
+        stage.clear();
         table = new Table();
         table.setFillParent(true);
-        Label nomore = new Label("No more levels.", sm.labelStyle);
-        Label youwin = new Label("I guess that means you win!", sm.labelStyle);
+        Label nomore = new Label("There's no more levels.", sm.labelStyle);
+        Label youwin = new Label("I guess that means you win?", sm.labelStyle);
+        Label grats = new Label("Congrats. You da man.", sm.labelStyle);
         TextButton menu = new TextButton("Return to Menu", sm.buttonStyle);
         menu.padTop(10);
         menu.addListener(new ChangeListener() {
@@ -69,6 +70,7 @@ public class End implements Screen {
 
         column.addActor(nomore);
         column.addActor(youwin);
+        column.addActor(grats);
         column.addActor(menu);
         column.addActor(restart);
 
