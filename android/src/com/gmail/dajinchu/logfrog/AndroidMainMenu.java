@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.gmail.dajinchu.Bench;
 import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.MainMenu;
 import com.gmail.dajinchu.ScreenManager;
@@ -65,6 +66,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
     @Override
     public void show() {
+        Bench.start("menushow");
         mGoogleApiClient = new GoogleApiClient.Builder(context)
             .addConnectionCallbacks(this)
             .addOnConnectionFailedListener(this)
@@ -74,6 +76,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             .build();
         if(!sm.prefs.contains("level")){
             sm.setScreen(new Tutorial(sm,new AndroidAnalyticsHelper(context),new AndroidSavedGameHelper(mGoogleApiClient)));
+            return;
         }
 
         stage = sm.uistage;
@@ -127,6 +130,7 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
 
         Gdx.app.log("MainMenu","show");
         onStart();
+        Bench.end("menushow");
     }
 
     public void toggleSignIn(){

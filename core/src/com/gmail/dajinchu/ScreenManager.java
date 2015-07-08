@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -38,6 +39,7 @@ public class ScreenManager extends Game {
     public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
     public InputMultiplexer multiplexer;
+    private AssetManager assets;
 
     public ScreenManager(MainMenu menuScreen){
         this.menuScreen = menuScreen;
@@ -45,6 +47,8 @@ public class ScreenManager extends Game {
     }
     @Override
     public void create() {
+        //assets = new AssetManager();
+        Bench.start("smload");
         prefs=Gdx.app.getPreferences("My Prefs");
         Gdx.input.setCatchBackKey(true);
 
@@ -52,10 +56,16 @@ public class ScreenManager extends Game {
         renderer = new ShapeRenderer();
         font = new BitmapFont();
 
+        Bench.start("smartfontinit");
         SmartFontGenerator fontGenerator = new SmartFontGenerator();
+        Bench.end("smartfontinit");
+        Bench.start("loadfont");
         FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
+        Bench.end("loadfont");
+        Bench.start("createFont");
         BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
         BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth()*.15f));
+        Bench.end("createFont");
 
         NinePatchDrawable buttonup =new NinePatchDrawable(new NinePatch(new Texture("buttonuplight.png"),1,1,1,1));
         NinePatchDrawable buttondown =new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"),1,1,1,1));
@@ -81,13 +91,18 @@ public class ScreenManager extends Game {
         checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked,checked,fontSmall,Color.WHITE);
         checkBoxStyle.up=buttonup;
 
+        Bench.start("viewport");
         uiviewport = new ScreenViewport();
         uistage = new Stage(uiviewport);
+        Bench.end("viewport");
 
+        Bench.start("multiplex");
         multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uistage);
         Gdx.input.setInputProcessor(multiplexer);
+        Bench.start("multiplex");
 
+        Bench.end("smload");
         mainmenu();
     }
 
