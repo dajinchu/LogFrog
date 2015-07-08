@@ -33,7 +33,7 @@ public class ScreenManager extends Game {
     public Viewport uiviewport;
 
     public BitmapFont font;
-    public Label.LabelStyle labelStyle;
+    public Label.LabelStyle labelStyle, labelStyleLarge;
     public TextButton.TextButtonStyle buttonStyle, buttonStyleLarge;
     public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
@@ -62,6 +62,9 @@ public class ScreenManager extends Game {
         labelStyle = new Label.LabelStyle();
         labelStyle.font=fontSmall;
         labelStyle.fontColor=Color.BLACK;
+
+        labelStyleLarge = new Label.LabelStyle(labelStyle);
+        labelStyleLarge.font=fontLarge;
 
         buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = fontSmall;
@@ -112,8 +115,8 @@ public class ScreenManager extends Game {
 
     @Override
     public void resize(int w,int h){
-        super.resize(w,h);
-        uiviewport.update(w,h);
+        super.resize(w, h);
+        uiviewport.update(w, h);
         uistage.setViewport(uiviewport);
     }
 }

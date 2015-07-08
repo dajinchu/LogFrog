@@ -1,8 +1,8 @@
 package com.gmail.dajinchu.desktop;
 
-import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.MainMenu;
 import com.gmail.dajinchu.ScreenManager;
+import com.gmail.dajinchu.Tutorial;
 
 /**
  * Created by Da-Jin on 6/2/2015.
@@ -27,7 +27,7 @@ public class DesktopMainMenu implements MainMenu {
 
     @Override
     public void show() {
-        sm.setScreen(new MainGame(sm, new DesktopAnalyticsHelper(), new DesktopSavedGameHelper()));
+        sm.setScreen(new Tutorial(sm, new DesktopAnalyticsHelper(), new DesktopSavedGameHelper()));
 
 
     }
