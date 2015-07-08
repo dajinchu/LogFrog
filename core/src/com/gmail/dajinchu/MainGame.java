@@ -39,7 +39,7 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
     Stage uistage;
     private Table infotable;
 
-    static float nodeRadius=4, logWidth=4;
+    static float nodeRadius=5, logWidth=6;
     static int mapHeight, mapWidth;
     static{
         mapWidth = (int) (4*20+nodeRadius*2);

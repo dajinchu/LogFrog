@@ -107,10 +107,10 @@ public class GameView {
     public void drawLink(Batch batch, Link l){
         batch.begin();
         batch.draw(linkregion,
-                l.center.x-MainGame.logWidth/2,l.center.y-l.distance*10,
-                MainGame.logWidth/2, l.distance*20/2,
-                MainGame.logWidth, l.distance*20,
-                1,1,
+                l.center.x - MainGame.logWidth / 2, l.center.y - l.distance * 10,
+                MainGame.logWidth / 2, l.distance * 20 / 2,
+                MainGame.logWidth, l.distance * 20,
+                1, 1,
                 l.rotation);
         batch.end();
     }

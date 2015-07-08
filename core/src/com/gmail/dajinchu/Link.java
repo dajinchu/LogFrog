@@ -67,19 +67,22 @@ public class Link {
             height=WIDTH;
             left*=20;
             bottom*=20;
-            bottom+=(8-WIDTH)/2;
+            bottom-=WIDTH/2;
+            left+=MainGame.nodeRadius;
+            bottom+=MainGame.nodeRadius;
             rotation = 90;
 
         }else{
             height=Math.abs(n1.y-n2.y)*20;
             width=WIDTH;
-            left*=20;
             bottom*=20;
+            left*=20;
             left-=WIDTH/2;
-            bottom+=8/2;
+            left+=MainGame.nodeRadius;
+            bottom+=MainGame.nodeRadius;
             rotation = 0;
         }
-        hitBox = new Rectangle(left+4, bottom, width, height);
+        hitBox = new Rectangle(left, bottom, width, height);
         hitBox.getCenter(center);
     }
 
