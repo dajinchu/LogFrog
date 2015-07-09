@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
+import com.badlogic.gdx.utils.async.AsyncTask;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -39,7 +41,9 @@ public class ScreenManager extends Game {
     public CheckBox.CheckBoxStyle checkBoxStyle;
     public Preferences prefs;
     public InputMultiplexer multiplexer;
-    private AssetManager assets;
+    AssetManager assets;
+    AsyncExecutor executor = new AsyncExecutor(1);
+    boolean done = false;
 
     public ScreenManager(MainMenu menuScreen){
         this.menuScreen = menuScreen;
@@ -47,52 +51,17 @@ public class ScreenManager extends Game {
     }
     @Override
     public void create() {
-        //assets = new AssetManager();
         Bench.start("smload");
-        prefs=Gdx.app.getPreferences("My Prefs");
+        prefs = Gdx.app.getPreferences("My Prefs");
         Gdx.input.setCatchBackKey(true);
 
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
         font = new BitmapFont();
 
-        Bench.start("smartfontinit");
-        SmartFontGenerator fontGenerator = new SmartFontGenerator();
-        Bench.end("smartfontinit");
-        Bench.start("loadfont");
-        FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
-        Bench.end("loadfont");
-        Bench.start("createFont");
-        BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
-        BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth()*.15f));
-        Bench.end("createFont");
-
-        NinePatchDrawable buttonup =new NinePatchDrawable(new NinePatch(new Texture("buttonuplight.png"),1,1,1,1));
-        NinePatchDrawable buttondown =new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"),1,1,1,1));
-        labelStyle = new Label.LabelStyle();
-        labelStyle.font=fontSmall;
-        labelStyle.fontColor=Color.BLACK;
-
-        labelStyleLarge = new Label.LabelStyle(labelStyle);
-        labelStyleLarge.font=fontLarge;
-
-        buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = fontSmall;
-        buttonStyle.downFontColor= Color.WHITE;
-        buttonStyle.fontColor=Color.BLACK;
-        buttonStyle.up=buttonup;
-        buttonStyle.down=buttondown;
-
-        buttonStyleLarge = new TextButton.TextButtonStyle(buttonStyle);
-        buttonStyleLarge.font = fontLarge;
-
-        TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(new Texture("checked.png")));
-        TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
-        checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked,checked,fontSmall,Color.WHITE);
-        checkBoxStyle.up=buttonup;
-
         Bench.start("viewport");
         uiviewport = new ScreenViewport();
+        uiviewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         uistage = new Stage(uiviewport);
         Bench.end("viewport");
 
@@ -102,9 +71,71 @@ public class ScreenManager extends Game {
         Gdx.input.setInputProcessor(multiplexer);
         Bench.start("multiplex");
 
-        Bench.end("smload");
-        mainmenu();
+
+
+        setScreen(new Loading(this));
+
     }
+
+    public void setupAssets(){
+        assets = new AssetManager();
+
+        Bench.start("smartfontinit");
+        final SmartFontGenerator fontGenerator = new SmartFontGenerator();
+        Bench.end("smartfontinit");
+        Bench.start("loadfont");
+        final FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
+        Bench.end("loadfont");
+
+        Gdx.app.log("Sm", "async task goin");
+
+        Bench.start("createFont");
+        final BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
+        final BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth() * .15f));
+        Bench.end("createFont");
+
+        executor.submit(new AsyncTask<Object>() {
+            @Override
+            public Object call() throws Exception {
+                assets.load("buttonuplight.png", Texture.class);
+                assets.finishLoading();
+
+                NinePatchDrawable buttonup = new NinePatchDrawable(new NinePatch(assets.get("buttonuplight.png", Texture.class), 1, 1, 1, 1));
+                NinePatchDrawable buttondown = new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"), 1, 1, 1, 1));
+                labelStyle = new Label.LabelStyle();
+                labelStyle.font = fontSmall;
+                labelStyle.fontColor = Color.BLACK;
+
+                labelStyleLarge = new Label.LabelStyle(labelStyle);
+                labelStyleLarge.font = fontLarge;
+
+                buttonStyle = new TextButton.TextButtonStyle();
+                buttonStyle.font = fontSmall;
+                buttonStyle.downFontColor = Color.WHITE;
+                buttonStyle.fontColor = Color.BLACK;
+                buttonStyle.up = buttonup;
+                buttonStyle.down = buttondown;
+
+                buttonStyleLarge = new TextButton.TextButtonStyle(buttonStyle);
+                buttonStyleLarge.font = fontLarge;
+
+                assets.load("checked.png", Texture.class);
+                assets.finishLoading();
+                TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(assets.get("checked.png",Texture.class)));
+                TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
+                checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked, checked, fontSmall, Color.WHITE);
+                checkBoxStyle.up = buttonup;
+                Bench.end("smload");
+                done=true;
+                return null;
+
+            }
+        });
+
+
+    }
+
+
 
     public void mainmenu(){
         prefs.flush();
@@ -131,8 +162,10 @@ public class ScreenManager extends Game {
     @Override
     public void resize(int w,int h){
         super.resize(w, h);
-        uiviewport.update(w, h);
-        uistage.setViewport(uiviewport);
+        if(uiviewport!=null) {
+            uiviewport.update(w, h);
+            uistage.setViewport(uiviewport);
+        }
     }
 }
 
