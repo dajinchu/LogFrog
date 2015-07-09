@@ -43,7 +43,7 @@ public class ScreenManager extends Game {
     public InputMultiplexer multiplexer;
     AssetManager assets;
     AsyncExecutor executor = new AsyncExecutor(1);
-    private boolean done = false;
+    boolean done = false;
 
     public ScreenManager(MainMenu menuScreen){
         this.menuScreen = menuScreen;
@@ -51,13 +51,6 @@ public class ScreenManager extends Game {
     }
     @Override
     public void create() {
-        setScreen(new Loading(this));
-        setupAssets();
-    }
-
-    public void setupAssets(){
-        assets = new AssetManager();
-
         Bench.start("smload");
         prefs = Gdx.app.getPreferences("My Prefs");
         Gdx.input.setCatchBackKey(true);
@@ -66,6 +59,27 @@ public class ScreenManager extends Game {
         renderer = new ShapeRenderer();
         font = new BitmapFont();
 
+        Bench.start("viewport");
+        uiviewport = new ScreenViewport();
+        uiviewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        uistage = new Stage(uiviewport);
+        Bench.end("viewport");
+
+        Bench.start("multiplex");
+        multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uistage);
+        Gdx.input.setInputProcessor(multiplexer);
+        Bench.start("multiplex");
+
+
+
+        setScreen(new Loading(this));
+
+    }
+
+    public void setupAssets(){
+        assets = new AssetManager();
+
         Bench.start("smartfontinit");
         final SmartFontGenerator fontGenerator = new SmartFontGenerator();
         Bench.end("smartfontinit");
@@ -73,23 +87,19 @@ public class ScreenManager extends Game {
         final FileHandle exoFile = Gdx.files.internal("LiberationMono-Regular.ttf");
         Bench.end("loadfont");
 
+        Gdx.app.log("Sm", "async task goin");
+
+        Bench.start("createFont");
+        final BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
+        final BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth() * .15f));
+        Bench.end("createFont");
+
         executor.submit(new AsyncTask<Object>() {
             @Override
             public Object call() throws Exception {
-                Gdx.app.log("Sm", "async task goin");
-
-                Bench.start("createFont");
-                final BitmapFont fontSmall = fontGenerator.createFont(exoFile, "exo-medium", (int) (Gdx.graphics.getWidth() * .05f));
-                final BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth() * .15f));
-                Bench.end("createFont");
                 assets.load("buttonuplight.png", Texture.class);
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
+                assets.finishLoading();
 
-                        assets.finishLoading();
-                    }
-                });
                 NinePatchDrawable buttonup = new NinePatchDrawable(new NinePatch(assets.get("buttonuplight.png", Texture.class), 1, 1, 1, 1));
                 NinePatchDrawable buttondown = new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"), 1, 1, 1, 1));
                 labelStyle = new Label.LabelStyle();
@@ -115,31 +125,17 @@ public class ScreenManager extends Game {
                 TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
                 checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked, checked, fontSmall, Color.WHITE);
                 checkBoxStyle.up = buttonup;
-
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainmenu();
-                    }
-                });
+                Bench.end("smload");
+                done=true;
                 return null;
+
             }
         });
 
-        Bench.start("viewport");
-        uiviewport = new ScreenViewport();
-        uiviewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        uistage = new Stage(uiviewport);
-        Bench.end("viewport");
 
-        Bench.start("multiplex");
-        multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(uistage);
-        Gdx.input.setInputProcessor(multiplexer);
-        Bench.start("multiplex");
-
-        Bench.end("smload");
     }
+
+
 
     public void mainmenu(){
         prefs.flush();
