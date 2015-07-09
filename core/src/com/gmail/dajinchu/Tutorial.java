@@ -119,7 +119,7 @@ public class Tutorial extends MainGame{
                 isArrow=false;
             }
         }else{
-            sm.prefs.putInteger("level", 0);
+            sm.prefs.putInteger("level", 1);
             sm.mainmenu();
             return;
         }
