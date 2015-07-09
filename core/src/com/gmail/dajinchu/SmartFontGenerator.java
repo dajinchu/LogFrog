@@ -86,7 +86,9 @@ public class SmartFontGenerator {
         TextureRegion[] texRegions = new TextureRegion[pages.size];
         for (int i=0; i<pages.size; i++) {
             PixmapPacker.Page p = pages.get(i);
-            Texture tex = new Texture(new PixmapTextureData(p.getPixmap(), p.getPixmap().getFormat(), false, false, true)) {
+            Texture tex = new Texture(
+                    new PixmapTextureData(
+                            p.getPixmap(), p.getPixmap().getFormat(), false, false, true)) {
                 @Override
                 public void dispose () {
                     super.dispose();
