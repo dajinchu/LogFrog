@@ -58,8 +58,9 @@ public class ScreenManager extends Game {
 
         Bench.start("viewport");
         uiviewport = new ScreenViewport();
-        uiviewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         uistage = new Stage(uiviewport);
+        uiviewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        uistage.setViewport(uiviewport);
         Bench.end("viewport");
 
         Bench.start("multiplex");

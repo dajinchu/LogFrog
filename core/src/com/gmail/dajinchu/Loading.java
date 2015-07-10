@@ -4,6 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 
 /**
  * Created by Da-Jin on 7/8/2015.
@@ -26,13 +31,10 @@ public class Loading implements Screen {
             sm.setupAssets();
         }
 
-        Gdx.app.log("loading", Gdx.graphics.getWidth()+" "+hi.getWidth());
-        sm.batch.begin();
-        //TODO USE A FUCKING VIEWPORT
-        sm.batch.draw(hi, Gdx.graphics.getWidth()/4,Gdx.graphics.getHeight()/2,Gdx.graphics.getWidth()/2,Gdx.graphics.getWidth()/2*(hi.getHeight()/(float)hi.getWidth()));
-        sm.batch.end();
-        go = true;
+        sm.uistage.draw();
 
+
+        go = true;
     }
 
     @Override
@@ -42,7 +44,12 @@ public class Loading implements Screen {
 
     @Override
     public void show() {
-
+        sm.uistage.clear();
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+        table.add(new Image(new TextureRegionDrawable(new TextureRegion(hi)), Scaling.fillX)).pad(10);
+        sm.uistage.addActor(table);
     }
 
     @Override
