@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class Loading implements Screen {
 
     private final ScreenManager sm;
-    Texture hi = new Texture("loading.png");
+    Texture hi = new Texture("link letter logo.png");
     private boolean go = false;
 
     public Loading(ScreenManager sm){
