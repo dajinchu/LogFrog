@@ -20,7 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
-import com.badlogic.gdx.utils.async.AsyncTask;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -35,7 +34,6 @@ public class ScreenManager extends Game {
     public Stage uistage;
     public Viewport uiviewport;
 
-    public BitmapFont font;
     public Label.LabelStyle labelStyle, labelStyleLarge;
     public TextButton.TextButtonStyle buttonStyle, buttonStyleLarge;
     public CheckBox.CheckBoxStyle checkBoxStyle;
@@ -57,7 +55,6 @@ public class ScreenManager extends Game {
 
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        font = new BitmapFont();
 
         Bench.start("viewport");
         uiviewport = new ScreenViewport();
@@ -94,43 +91,36 @@ public class ScreenManager extends Game {
         final BitmapFont fontLarge = fontGenerator.createFont(exoFile, "exo-large", (int) (Gdx.graphics.getWidth() * .15f));
         Bench.end("createFont");
 
-        executor.submit(new AsyncTask<Object>() {
-            @Override
-            public Object call() throws Exception {
-                assets.load("buttonuplight.png", Texture.class);
-                assets.finishLoading();
+        assets.load("buttonuplight.png", Texture.class);
+        assets.finishLoading();
 
-                NinePatchDrawable buttonup = new NinePatchDrawable(new NinePatch(assets.get("buttonuplight.png", Texture.class), 1, 1, 1, 1));
-                NinePatchDrawable buttondown = new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"), 1, 1, 1, 1));
-                labelStyle = new Label.LabelStyle();
-                labelStyle.font = fontSmall;
-                labelStyle.fontColor = Color.BLACK;
+        NinePatchDrawable buttonup = new NinePatchDrawable(new NinePatch(assets.get("buttonuplight.png", Texture.class), 1, 1, 1, 1));
+        NinePatchDrawable buttondown = new NinePatchDrawable(new NinePatch(new Texture("buttondownlight.png"), 1, 1, 1, 1));
+        labelStyle = new Label.LabelStyle();
+        labelStyle.font = fontSmall;
+        labelStyle.fontColor = Color.BLACK;
 
-                labelStyleLarge = new Label.LabelStyle(labelStyle);
-                labelStyleLarge.font = fontLarge;
+        labelStyleLarge = new Label.LabelStyle(labelStyle);
+        labelStyleLarge.font = fontLarge;
 
-                buttonStyle = new TextButton.TextButtonStyle();
-                buttonStyle.font = fontSmall;
-                buttonStyle.downFontColor = Color.WHITE;
-                buttonStyle.fontColor = Color.BLACK;
-                buttonStyle.up = buttonup;
-                buttonStyle.down = buttondown;
+        buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = fontSmall;
+        buttonStyle.downFontColor = Color.WHITE;
+        buttonStyle.fontColor = Color.BLACK;
+        buttonStyle.up = buttonup;
+        buttonStyle.down = buttondown;
 
-                buttonStyleLarge = new TextButton.TextButtonStyle(buttonStyle);
-                buttonStyleLarge.font = fontLarge;
+        buttonStyleLarge = new TextButton.TextButtonStyle(buttonStyle);
+        buttonStyleLarge.font = fontLarge;
 
-                assets.load("checked.png", Texture.class);
-                assets.finishLoading();
-                TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(assets.get("checked.png",Texture.class)));
-                TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
-                checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked, checked, fontSmall, Color.WHITE);
-                checkBoxStyle.up = buttonup;
-                Bench.end("smload");
-                done=true;
-                return null;
-
-            }
-        });
+        assets.load("checked.png", Texture.class);
+        assets.finishLoading();
+        TextureRegionDrawable checked = new TextureRegionDrawable(new TextureRegion(assets.get("checked.png",Texture.class)));
+        TextureRegionDrawable unchecked = new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png")));
+        checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked, checked, fontSmall, Color.WHITE);
+        checkBoxStyle.up = buttonup;
+        //Bench.end("smload");
+        mainmenu();
 
 
     }
@@ -144,6 +134,7 @@ public class ScreenManager extends Game {
 
     @Override
     public void pause(){
+        executor.dispose();
         prefs.flush();
     }
 
@@ -154,7 +145,6 @@ public class ScreenManager extends Game {
     
     @Override
     public void dispose(){
-        font.dispose();
         batch.dispose();
         renderer.dispose();
     }

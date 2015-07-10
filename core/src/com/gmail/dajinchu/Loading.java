@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class Loading implements Screen {
 
     private final ScreenManager sm;
-    Texture hi = new Texture("checked.png");
+    Texture hi = new Texture("loading.png");
     private boolean go = false;
 
     public Loading(ScreenManager sm){
@@ -24,16 +24,14 @@ public class Loading implements Screen {
 
         if(go){
             sm.setupAssets();
-
         }
 
+        Gdx.app.log("loading", Gdx.graphics.getWidth()+" "+hi.getWidth());
         sm.batch.begin();
-        sm.batch.draw(hi, 50,50);
+        //TODO USE A FUCKING VIEWPORT
+        sm.batch.draw(hi, Gdx.graphics.getWidth()/4,Gdx.graphics.getHeight()/2,Gdx.graphics.getWidth()/2,Gdx.graphics.getWidth()/2*(hi.getHeight()/(float)hi.getWidth()));
         sm.batch.end();
         go = true;
-        if(sm.done){
-            sm.mainmenu();
-        }
 
     }
 
