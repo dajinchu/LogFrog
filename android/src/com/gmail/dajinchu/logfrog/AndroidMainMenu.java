@@ -193,7 +193,9 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     }
 
     public void onStop(){
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient!=null){
+            mGoogleApiClient.disconnect();
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent){
