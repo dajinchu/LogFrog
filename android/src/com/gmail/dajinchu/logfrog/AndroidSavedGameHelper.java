@@ -100,6 +100,9 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
             }
             @Override
             protected void onPostExecute(Integer status){
+                if(status != GamesStatusCodes.STATUS_OK){
+                    return;
+                }
                 if(mSaveGameData.length<1){
                     game.onGameLoad(new byte[]{(byte) 1});
                 }else {
