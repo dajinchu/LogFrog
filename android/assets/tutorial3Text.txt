@@ -1,2 +1,2 @@
-WIN
-Get to the green node
+LOAD
+Hop to the green node
