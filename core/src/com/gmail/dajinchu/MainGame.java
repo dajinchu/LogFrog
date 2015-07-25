@@ -38,7 +38,7 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
     Model model;
     private ShapeRenderer renderer;
     Stage uistage;
-    private Table infotable;
+    public Table infotable;
 
     static float nodeRadius=5, logWidth=6;
     static int mapHeight, mapWidth;
@@ -55,7 +55,7 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
 
     public static AnalyticsHelper ah;
     public final SavedGameHelper sgh;
-    private TextButton options;
+    public TextButton options;
     private GameView view;
     Label levelinfo;
     private Table optionmenu;

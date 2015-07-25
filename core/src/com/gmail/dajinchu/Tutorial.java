@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 /**
  * Created by Da-Jin on 7/2/2015.
@@ -26,6 +27,8 @@ public class Tutorial extends MainGame{
     @Override
     public void makeInfoTable(){
         levelinfo = new Label("",sm.labelStyle);
+        options=new TextButton("",sm.buttonStyle);
+        infotable=new Table();
     }
 
     @Override
@@ -76,11 +79,11 @@ public class Tutorial extends MainGame{
         bottomText = new Label("",gSmall);
         bottomText2 = new Label("",gSmall);
 
-        instructions.add(topText).expandY().top().padTop(100);
+        instructions.add(topText).expandY().top().padTop(uistage.getHeight()*.05f);
         instructions.row();
-        instructions.add(bottomText).bottom().padBottom(50);
+        instructions.add(bottomText).bottom().padBottom(uistage.getHeight()*.05f);
         instructions.row();
-        instructions.add(bottomText2).bottom().padBottom(50);
+        instructions.add(bottomText2).bottom().padBottom(uistage.getHeight()*.05f);
 
         uistage.addActor(instructions);
     }
@@ -92,8 +95,10 @@ public class Tutorial extends MainGame{
 
     @Override
     public void resize(int w, int h) {
+        super.resize(w,h);
         viewport.update(w, h, true);
     }
+
     @Override
     protected void loadLevel(){
         FileHandle modelData = Gdx.files.internal("tutorial"+level+".txt");
