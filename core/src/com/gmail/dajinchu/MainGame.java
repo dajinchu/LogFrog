@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -41,6 +42,8 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
 
     static float nodeRadius=5, logWidth=6;
     static int mapHeight, mapWidth;
+    private OrthographicCamera cam;
+
     static{
         mapWidth = (int) (4*20+nodeRadius*2);
         mapHeight = (int) (6*20+nodeRadius*2);
@@ -76,6 +79,8 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         viewport = new FitViewport(mapWidth, mapHeight);
+        cam= new OrthographicCamera();
+        viewport.setCamera(cam);
 
         uistage = sm.uistage;
         uistage.clear();
@@ -220,6 +225,7 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
         if(model==null){
             return;
         }
+
         view.draw(batch, renderer);
 
         //.apply changes the "active" viewport. SO IMPORTANT, and NOT ON DOCUMENTATION
@@ -231,6 +237,8 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
     @Override
     public void resize(int w, int h){
         viewport.update(w, (int) (h - options.getHeight() - infotable.getPadBottom() - infotable.getPadTop()), true);
+        cam.zoom=1.1f;
+
         /*
         float translate =viewport.unproject(new Vector3(0,h-viewport.project(new Vector2(0,mapHeight)).y,0)).y;
         Gdx.app.log("Main", "translate "+translate+"height "+h+" map "+viewport.project(new Vector2(0,mapHeight)).y);
