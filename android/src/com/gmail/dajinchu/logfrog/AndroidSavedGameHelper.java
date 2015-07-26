@@ -154,4 +154,8 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
         // Fail, return null.
         return null;
     }
+    @Override
+    public void setStepsAchievement(String id, int steps){
+        Games.Achievements.setSteps(mGoogleApiClient,id,steps);
+    }
 }

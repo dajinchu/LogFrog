@@ -6,4 +6,6 @@ package com.gmail.dajinchu;
 public interface SavedGameHelper {
     public void write(byte[] data);
     void load(SavedGameListener game);
+
+    void setStepsAchievement(String id, int steps);
 }

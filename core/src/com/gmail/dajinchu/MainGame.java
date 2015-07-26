@@ -292,6 +292,7 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
 
         level++;
         sgh.write(new byte[]{(byte) level});
+        sgh.setStepsAchievement("CgkIldTq9O0NEAIQBQ",level);
         sm.prefs.putInteger("level", level);
         loadLevel();
 
