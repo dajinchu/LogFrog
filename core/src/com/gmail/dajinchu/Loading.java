@@ -29,6 +29,7 @@ public class Loading implements Screen {
 
         if(go){
             sm.setupAssets();
+            sm.mainmenu();
         }
 
         sm.uistage.draw();

@@ -1,1 +1,2 @@
+include ':desktopjar'
 include 'desktop', 'android', 'core', 'ios', ':BaseGameUtils'

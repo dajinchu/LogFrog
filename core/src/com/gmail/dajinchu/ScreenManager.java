@@ -49,8 +49,10 @@ public class ScreenManager extends Game {
     }
     @Override
     public void create() {
+        Gdx.graphics.setTitle("Log Frog");
+
         Bench.start("smload");
-        prefs = Gdx.app.getPreferences("My Prefs");
+        prefs = Gdx.app.getPreferences("logfrogprefs");
         Gdx.input.setCatchBackKey(true);
 
         batch = new SpriteBatch();
@@ -121,7 +123,6 @@ public class ScreenManager extends Game {
         checkBoxStyle = new CheckBox.CheckBoxStyle(unchecked, checked, fontSmall, Color.WHITE);
         checkBoxStyle.up = buttonup;
         //Bench.end("smload");
-        mainmenu();
 
 
     }
@@ -152,11 +153,12 @@ public class ScreenManager extends Game {
 
     @Override
     public void resize(int w,int h){
-        super.resize(w, h);
         if(uiviewport!=null) {
-            uiviewport.update(w, h);
+            uiviewport.update(w, h, true);
+            Gdx.app.log("MainMenu",uiviewport.getWorldWidth()+" "+w);
             uistage.setViewport(uiviewport);
         }
+        super.resize(w, h);
     }
 }
 

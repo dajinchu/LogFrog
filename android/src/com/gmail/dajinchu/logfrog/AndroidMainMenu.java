@@ -6,21 +6,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.gmail.dajinchu.Bench;
-import com.gmail.dajinchu.MainGame;
+import com.gmail.dajinchu.AnalyticsHelper;
 import com.gmail.dajinchu.MainMenu;
-import com.gmail.dajinchu.ScreenManager;
-import com.gmail.dajinchu.Tutorial;
+import com.gmail.dajinchu.SavedGameHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
@@ -31,10 +26,8 @@ import com.google.example.games.basegameutils.BaseGameUtils;
 /**
  * Created by Da-Jin on 5/31/2015.
  */
-public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class AndroidMainMenu extends MainMenu implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private Table table;
-    private Stage stage;
 
     private GoogleApiClient mGoogleApiClient;
     private final AndroidLauncher context;
@@ -42,8 +35,6 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
     private boolean mAutoStartSignInFlow = true;
     private boolean mSignInClicked = false;
     private static int RC_SIGN_IN = 9001;
-    private ScreenManager sm;
-    private TextButton startGame;
     private ImageTextButton GPGS;
 
 
@@ -51,23 +42,9 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
         this.context = context;
 
     }
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glClearColor(1,1,1,1);
-        sm.uiviewport.apply();
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-
-    }
 
     @Override
     public void show() {
-        Bench.start("menushow");
         mGoogleApiClient = new GoogleApiClient.Builder(context)
             .addConnectionCallbacks(this)
             .addOnConnectionFailedListener(this)
@@ -75,17 +52,15 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             .addApi(Games.API).addScope(Games.SCOPE_GAMES)
             .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
             .build();
-        if(!sm.prefs.contains("level")){
-            sm.setScreen(new Tutorial(sm,new AndroidAnalyticsHelper(context),new AndroidSavedGameHelper(mGoogleApiClient)));
-            return;
-        }
+        super.show();
 
-        stage = sm.uistage;
-        stage.clear();
-        table = new Table();
-        table.setFillParent(true);
-        table.pad(10);
 
+        createSignInButton();
+
+        onStart();
+    }
+
+    private void createSignInButton() {
         ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle(sm.buttonStyle);
         style.imageUp=new TextureRegionDrawable(new TextureRegion(new Texture("games_icon.png")));
         GPGS = new ImageTextButton("LOGIN", style);
@@ -95,43 +70,23 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
                 toggleSignIn();
             }
         });
-        startGame = new TextButton("Play", sm.buttonStyleLarge);
-        startGame.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                AndroidMainMenu.this.dispose();
-                MainGame maingame = new MainGame(sm,
-                        new AndroidAnalyticsHelper(context),
-                        new AndroidSavedGameHelper(mGoogleApiClient));
-                sm.prefs.flush();
-                sm.setScreen(maingame);
-            }
-        });
-        TextButton tutorial = new TextButton("Tutorial", sm.buttonStyle);
-        tutorial.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                AndroidMainMenu.this.dispose();
-                Tutorial tut = new Tutorial(sm,
-                        new AndroidAnalyticsHelper(context),
-                        new AndroidSavedGameHelper(mGoogleApiClient));
-                sm.prefs.flush();
-                sm.setScreen(tut);
-            }
-        });
+
         GPGS.setVisible(false);
 
-        table.add(GPGS).expand().top().right().padTop(20).padRight(20);
-        table.row();
-        table.add(startGame).top();
-        table.row();
-        table.add(tutorial).expandY().top().pad(20);
+        Table signintable = new Table();
+        signintable.setFillParent(true);
+        signintable.add(GPGS).expand().top().right().padTop(20).padRight(20);
+        stage.addActor(signintable);
+    }
 
-        stage.addActor(table);
+    @Override
+    public AnalyticsHelper createAH() {
+        return new AndroidAnalyticsHelper(context);
+    }
 
-        Gdx.app.log("MainMenu","show");
-        onStart();
-        Bench.end("menushow");
+    @Override
+    public SavedGameHelper createSGH() {
+        return new AndroidSavedGameHelper(mGoogleApiClient);
     }
 
     public void toggleSignIn(){
@@ -258,10 +213,5 @@ public class AndroidMainMenu implements MainMenu, GoogleApiClient.ConnectionCall
             }
         }
         showSignIn();
-    }
-
-    @Override
-    public void setScreenManager(ScreenManager sm) {
-        this.sm=sm;
     }
 }

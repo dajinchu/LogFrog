@@ -16,4 +16,9 @@ public class DesktopSavedGameHelper implements SavedGameHelper {
     public void load(SavedGameListener game) {
        game.onGameLoad(new byte[]{(byte)1});
     }
+
+    @Override
+    public void setStepsAchievement(String id, int steps) {
+
+    }
 }

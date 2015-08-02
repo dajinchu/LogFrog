@@ -10,7 +10,13 @@ public class IosSavedGameHelper implements SavedGameHelper {
     }
 
     @Override
-    public void load(MainGame game) {
-        game.level=(1);
+    public void load(SavedGameListener game) {
+
     }
+
+    @Override
+    public void setStepsAchievement(String id, int steps) {
+
+    }
+
 }

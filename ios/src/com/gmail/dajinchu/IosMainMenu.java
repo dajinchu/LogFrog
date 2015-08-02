@@ -3,7 +3,7 @@ package com.gmail.dajinchu;
 /**
  * Created by Da-Jin on 6/9/2015.
  */
-public class IosMainMenu implements MainMenu {
+public class IosMainMenu extends MainMenu {
     private ScreenManager sm;
 
     @Override
@@ -19,6 +19,16 @@ public class IosMainMenu implements MainMenu {
     @Override
     public void resize(int width, int height) {
 
+    }
+
+    @Override
+    public AnalyticsHelper createAH() {
+        return null;
+    }
+
+    @Override
+    public SavedGameHelper createSGH() {
+        return null;
     }
 
     @Override
