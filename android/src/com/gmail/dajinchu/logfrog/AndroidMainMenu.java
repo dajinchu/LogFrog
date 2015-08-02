@@ -54,13 +54,14 @@ public class AndroidMainMenu extends MainMenu implements GoogleApiClient.Connect
             .build();
         super.show();
 
-
-        createSignInButton();
-
-        onStart();
+        if(sm.getScreen()==this){
+            //need this check in case we went to tutorial in super.show
+            createSignInButton();
+            onStart();
+        }
     }
 
-    private void createSignInButton() {
+    protected void createSignInButton() {
         ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle(sm.buttonStyle);
         style.imageUp=new TextureRegionDrawable(new TextureRegion(new Texture("games_icon.png")));
         GPGS = new ImageTextButton("LOGIN", style);

@@ -60,14 +60,13 @@ public abstract class MainMenu implements Screen {
         table.add(tutorial).pad(20);
 
         stage.addActor(table);
-    }
 
+    }
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glClearColor(1,1,1,1);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         sm.uiviewport.apply();
-        Gdx.app.log("MainMenu",sm.uiviewport.getScreenX()+"");
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }

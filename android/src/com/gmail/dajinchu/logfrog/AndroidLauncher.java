@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.gmail.dajinchu.MainGame;
 import com.gmail.dajinchu.ScreenManager;
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 public class AndroidLauncher extends AndroidApplication {
@@ -21,6 +22,7 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        AndroidAnalyticsHelper.getTracker(this);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode=true;
         config.numSamples=2;
@@ -31,12 +33,14 @@ public class AndroidLauncher extends AndroidApplication {
 
     @Override
     public void onStart(){
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
         mainmenu.onStop();
     }
 

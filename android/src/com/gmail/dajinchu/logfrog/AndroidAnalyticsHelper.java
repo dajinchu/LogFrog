@@ -11,17 +11,19 @@ import com.google.android.gms.analytics.Tracker;
  * Created by Da-Jin on 5/29/2015.
  */
 public class AndroidAnalyticsHelper implements AnalyticsHelper {
-    private GoogleAnalytics analytics;
-    private Tracker tracker;
+    private static GoogleAnalytics analytics;
+    private static Tracker tracker;
+
+    public static Tracker getTracker(Context context){
+        if(tracker==null){
+            analytics = GoogleAnalytics.getInstance(context);
+            tracker=analytics.newTracker(R.xml.app_tracker);
+        }
+        return tracker;
+    }
 
     public AndroidAnalyticsHelper(Context context){
-        analytics = GoogleAnalytics.getInstance(context);
-
-        tracker = analytics.newTracker("UA-46986118-2");
-        tracker.enableExceptionReporting(true);
-        tracker.enableAutoActivityTracking(true);
-
-        tracker.setScreenName("MainGame");
+        getTracker(context);
     }
 
     @Override

@@ -156,6 +156,8 @@ public class AndroidSavedGameHelper implements SavedGameHelper {
     }
     @Override
     public void setStepsAchievement(String id, int steps){
-        Games.Achievements.setSteps(mGoogleApiClient,id,steps);
+        if(mGoogleApiClient.isConnected()) {
+            Games.Achievements.setSteps(mGoogleApiClient, id, steps);
+        }
     }
 }
