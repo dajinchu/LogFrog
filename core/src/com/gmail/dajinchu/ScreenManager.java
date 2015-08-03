@@ -52,7 +52,12 @@ public class ScreenManager extends Game {
         Gdx.graphics.setTitle("Log Frog");
 
         Bench.start("smload");
+        Preferences oldprefs = Gdx.app.getPreferences("My Prefs");
         prefs = Gdx.app.getPreferences("logfrogprefs");
+        if(oldprefs.getInteger("level")>prefs.getInteger("level")){
+            prefs.put(oldprefs.get());
+        }
+
         Gdx.input.setCatchBackKey(true);
 
         batch = new SpriteBatch();
