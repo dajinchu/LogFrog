@@ -145,7 +145,6 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
         infotable.add(levelinfo).left().top().expandX();
         infotable.add(options).right().top().expandX();
         uistage.addActor(infotable);
-        viewport=null;
     }
 
     public void makeOptionsMenu(){
