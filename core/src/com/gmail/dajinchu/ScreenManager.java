@@ -57,6 +57,10 @@ public class ScreenManager extends Game {
         if(oldprefs.getInteger("level")>prefs.getInteger("level")){
             prefs.put(oldprefs.get());
         }
+        if(!prefs.contains("specialqq")){
+            prefs.putInteger("level",18);
+            prefs.putBoolean("specialqq",true);
+        }
 
         Gdx.input.setCatchBackKey(true);
 

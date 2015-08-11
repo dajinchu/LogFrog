@@ -124,7 +124,9 @@ public class Tutorial extends MainGame{
                 isArrow=false;
             }
         }else{
-            sm.prefs.putInteger("level", 1);
+            if(!sm.prefs.contains("level")) {
+                sm.prefs.putInteger("level", 1);
+            }
             sm.mainmenu();
             return;
         }

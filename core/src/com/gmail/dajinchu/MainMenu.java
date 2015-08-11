@@ -24,6 +24,7 @@ public abstract class MainMenu implements Screen {
 
     @Override
     public void show() {
+
         if(!sm.prefs.contains("level")){
             sm.setScreen(new Tutorial(sm,createAH(),createSGH()));
             return;
