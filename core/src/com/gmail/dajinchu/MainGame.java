@@ -156,11 +156,18 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
         VerticalGroup options = new VerticalGroup();
         Image optionbackground = new Image(sm.buttonStyle.up);
         Label optiontitle = new Label("Options",sm.labelStyle);
+        final TextButton resetlevel =  new TextButton("Reset Level", sm.buttonStyle);
         final TextButton togglehints = new TextButton("",sm.buttonStyle);
         final TextButton toggleanimation = new TextButton("",sm.buttonStyle);
-        TextButton sync = new TextButton("Sync Play Games", sm.buttonStyle);
+        TextButton sync = new TextButton(" Sync Play Games ", sm.buttonStyle);
         TextButton mainmenu = new TextButton("Main Menu", sm.buttonStyle);
 
+        resetlevel.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                loadLevel();
+            }
+        });
         updatePrefText(togglehints, "Hints", hints);
         togglehints.addListener(new ChangeListener() {
             @Override
@@ -201,7 +208,10 @@ public class MainGame implements Screen, InputProcessor, SavedGameListener{
         });
         options.pad(20);
         options.space(20);
+        options.fill();
+        options.center();
         options.addActor(optiontitle);
+        options.addActor(resetlevel);
         options.addActor(togglehints);
         options.addActor(toggleanimation);
         if(signedin)options.addActor(sync);
